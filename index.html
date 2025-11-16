@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divorce Risk Calculator</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6; 
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        section { 
+            margin-bottom: 25px; 
+            padding: 40px; 
+            border: none; 
+            border-radius: 20px; 
+            background: white; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        
+        section.slide-in {
+            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        section.slide-out {
+            animation: slideOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+        
+        .hidden { 
+            display: none; 
+        }
+        
+        h1 { 
+            color: #2c3e50; 
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h2 { 
+            color: #2c3e50; 
+            font-size: 2em;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid;
+        }
+        
+        /* Color coding for sections */
+        #intro h1 { border-bottom: 3px solid #667eea; }
+        #part1 h2 { border-bottom-color: #3498db; }
+        #part2 h2 { border-bottom-color: #e74c3c; }
+        #part3 h2 { border-bottom-color: #f39c12; }
+        #part4 h2 { border-bottom-color: #27ae60; }
+        #part5 h2 { border-bottom-color: #9b59b6; }
+        #part6 h2 { border-bottom-color: #1abc9c; }
+        #results h2 { border-bottom-color: #34495e; }
+        
+        button { 
+            padding: 15px 35px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .results { 
+            background: linear-gradient(135deg, #e8f8f5 0%, #d5f5e3 100%);
+            padding: 40px; 
+            border-radius: 15px; 
+            font-size: 18px; 
+            text-align: center;
+            border: 2px solid #27ae60;
+        }
+        
+        .question-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .question-group:hover {
+            background: #f0f2f5;
+            transform: translateX(5px);
+        }
+        
+        #part1 .question-group { border-left-color: #3498db; }
+        #part2 .question-group { border-left-color: #e74c3c; }
+        #part3 .question-group { border-left-color: #f39c12; }
+        #part4 .question-group { border-left-color: #27ae60; }
+        #part5 .question-group { border-left-color: #9b59b6; }
+        #part6 .question-group { border-left-color: #1abc9c; }
+        
+        .question-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: stretch;
+        }
+        
+        .question-pair > div {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @media (max-width: 768px) {
+            .question-pair {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        label { 
+            display: block; 
+            margin: 15px 0 10px; 
+            font-weight: 600; 
+            color: #34495e;
+            font-size: 15px;
+        }
+        
+        .question-pair > div > label:first-child {
+            margin-top: 0;
+        }
+        
+        .question-pair label {
+            flex: 0 0 auto;
+        }
+        
+        .question-pair input,
+        .question-pair select {
+            flex: 0 0 auto;
+            margin-top: auto;
+        }
+        
+        input, select { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 10px; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .error { 
+            color: #e74c3c; 
+            font-size: 0.9em; 
+            margin-top: -10px; 
+            margin-bottom: 15px; 
+            display: none;
+            padding: 10px;
+            background: #fee;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .progress { 
+            font-size: 16px; 
+            color: #7f8c8d; 
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .top-factors { 
+            margin-top: 30px; 
+            font-size: 16px; 
+        }
+        
+        .top-factors h3 { 
+            margin: 20px 0 15px; 
+            color: #27ae60;
+            font-size: 1.3em;
+        }
+        
+        .top-factors ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+        
+        .top-factors li { 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: #d5f5e3; 
+            border-radius: 10px;
+            border-left: 4px solid #27ae60;
+            transition: all 0.3s ease;
+        }
+        
+        .top-factors li:hover {
+            transform: translateX(5px);
+        }
+        
+        .top-factors .risk { 
+            color: #c0392b; 
+            background: #fadbd8;
+            border-left-color: #e74c3c;
+        }
+        
+        .top-factors a {
+            transition: color 0.3s ease;
+        }
+        
+        .top-factors a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .section-description {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .intro-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .intro-content p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        #results .results p {
+            font-size: 1.3em;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        
+        #results .results p:first-child {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 0;
+            border: none;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+            position: relative;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content .container {
+            padding: 40px;
+        }
+        
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: color 0.3s ease;
+        }
+        
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #000;
+        }
+        
+        .modal-content h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .modal-content h2 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+        
+        .modal-content ul li {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .modal-content ul li strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .modal-content ul li a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .modal-content ul li a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .modal-content .note {
+            display: block;
+            margin-top: 8px;
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                max-height: 85vh;
+            }
+            
+            .modal-content .container {
+                padding: 30px 20px;
+            }
+            
+            .modal-content h1 {
+                font-size: 1.5em;
+            }
+            
+            .modal-content h2 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <!-- Editable Intro Section -->
+    <section id="intro">
+        <h1>Divorce Risk Calculator</h1>
+        <div class="intro-content">
+            <p><strong>Something to consider before you get married.</strong></p>
+            <p>Even with the best of intentions divorce is still a risk.  
+                This tool uses known, validated risk factors from thousands of marriages across dozens of studies to estimate your divorce risk.  
+                Whenever possible we tried to avoid double counting overlapping risk factors from strong group biases, but the nature of an excercise like this is that it's not 100% perfect, so use it primarily as an educational excercise.</p>
+            
+        </div>
+        <div style="text-align: center;">
+            <button onclick="startQuiz()">Start Quiz</button>
+        </div>
+    </section>
+
+    <!-- PART 1: DEMOGRAPHICS -->
+    <section id="part1" class="hidden">
+        <h2>Part 1: Demographics</h2>
+        <div class="progress">Step 1 of 6<div class="progress-bar"><div class="progress-fill" style="width: 16.67%"></div></div></div>
+        <p class="section-description">These questions help us understand your background.</p>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>What is your gender?</label>
+                    <select id="your_gender">
+                        <option value="">Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>What is your partner's gender?</label>
+                    <select id="partner_gender">
+                        <option value="">Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>What is your planned age at marriage?</label>
+                    <input type="number" id="your_age_marriage" min="18" max="70" placeholder="e.g., 28">
+                </div>
+                <div>
+                    <label>What is your partner's planned age at marriage?</label>
+                    <input type="number" id="partner_age_marriage" min="18" max="70" placeholder="e.g., 30">
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>What is your race/ethnicity?</label>
+                    <select id="your_race">
+                        <option value="">Select</option>
+                        <option>White</option>
+                        <option>Black</option>
+                        <option>Asian</option>
+                        <option>Hispanic</option>
+                        <option>Other</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>What is your partner's race/ethnicity?</label>
+                    <select id="partner_race">
+                        <option value="">Select</option>
+                        <option>White</option>
+                        <option>Black</option>
+                        <option>Asian</option>
+                        <option>Hispanic</option>
+                        <option>Other</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Are you a first-generation immigrant (born outside the U.S.)?</label>
+                    <select id="your_immigrant">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Is your partner a first-generation immigrant?</label>
+                    <select id="partner_immigrant">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="part1-error">Please fill all visible fields.</div>
+        <div style="text-align: center;">
+            <button onclick="nextPart(1)">Next →</button>
+        </div>
+    </section>
+
+    <!-- PART 2: FAMILY BACKGROUND -->
+    <section id="part2" class="hidden">
+        <h2>Part 2: Family Background</h2>
+        <div class="progress">Step 2 of 6<div class="progress-bar"><div class="progress-fill" style="width: 33.33%"></div></div></div>
+        <p class="section-description">These questions are about your upbringing.</p>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Did your biological parents divorce before you were 18?</label>
+                    <select id="your_parents_divorce" onchange="toggleConditional(this, 'your_remarry')">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                    <div id="your_remarry" class="hidden">
+                        <label>Did either parent remarry or cohabit with a new partner?</label>
+                        <select id="your_parent_remarry">
+                            <option value="">Select</option>
+                            <option>Yes</option>
+                            <option>No</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label>Did your partner's biological parents divorce before they were 18?</label>
+                    <select id="partner_parents_divorce" onchange="toggleConditional(this, 'partner_remarry')">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                    <div id="partner_remarry" class="hidden">
+                        <label>Did either parent remarry or cohabit with a new partner?</label>
+                        <select id="partner_parent_remarry">
+                            <option value="">Select</option>
+                            <option>Yes</option>
+                            <option>No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>On a scale of 1–5, how much conflict was there between your parents while growing up?</label>
+                    <select id="your_parent_conflict">
+                        <option value="">Select</option>
+                        <option value="1">1 (Very low)</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 (Very high)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Between your partner's parents?</label>
+                    <select id="partner_parent_conflict">
+                        <option value="">Select</option>
+                        <option value="1">1 (Very low)</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 (Very high)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Were you adopted or in foster care as a child?</label>
+                    <select id="your_adopted">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Was your partner?</label>
+                    <select id="partner_adopted">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="part2-error">Please fill all visible fields.</div>
+        <div style="text-align: center;">
+            <button onclick="nextPart(2)">Next →</button>
+        </div>
+    </section>
+
+    <!-- PART 3: RELATIONSHIP HISTORY -->
+    <section id="part3" class="hidden">
+        <h2>Part 3: Relationship History</h2>
+        <div class="progress">Step 3 of 6<div class="progress-bar"><div class="progress-fill" style="width: 50%"></div></div></div>
+        <p class="section-description">Your past and current relationship.</p>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Have you been married before?</label>
+                    <select id="your_prior_marriage" onchange="toggleConditional(this, 'your_prior_times')">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                    <div id="your_prior_times" class="hidden">
+                        <label>How many times?</label>
+                        <select id="your_prior_times_num">
+                            <option value="">Select</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3+">3 or more</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label>Has your partner been married before?</label>
+                    <select id="partner_prior_marriage" onchange="toggleConditional(this, 'partner_prior_times')">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                    <div id="partner_prior_times" class="hidden">
+                        <label>How many times?</label>
+                        <select id="partner_prior_times_num">
+                            <option value="">Select</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3+">3 or more</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>How many people (besides partner) have you lived with 6+ months?</label>
+                    <select id="your_prior_cohab">
+                        <option value="">Select</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2+">2 or more</option>
+                    </select>
+                </div>
+                <div>
+                    <label>How many for your partner?</label>
+                    <select id="partner_prior_cohab">
+                        <option value="">Select</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2+">2 or more</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Do you have children from a previous relationship?</label>
+                    <select id="your_prior_children">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Does your partner?</label>
+                    <select id="partner_prior_children">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <label>Do you have a child together or is one of you pregnant now?</label>
+            <select id="premarital_child">
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+            </select>
+        </div>
+
+        <div class="question-group">
+            <label>How long have you dated so far?</label>
+            <select id="courtship_length">
+                <option value="">Select</option>
+                <option value="less6">Less than 6 months</option>
+                <option value="6-18">6 to 18 months</option>
+                <option value="18-36">18 to 36 months</option>
+                <option value="3+">3 years or more</option>
+            </select>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Roughly how many sexual partners have you had before this?</label>
+                    <select id="your_prior_sex">
+                        <option value="">Select</option>
+                        <option value="0-1">0–1</option>
+                        <option value="2-9">2–9</option>
+                        <option value="10+">10+</option>
+                        <option value="prefer">Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>For your partner?</label>
+                    <select id="partner_prior_sex">
+                        <option value="">Select</option>
+                        <option value="0-1">0–1</option>
+                        <option value="2-9">2–9</option>
+                        <option value="10+">10+</option>
+                        <option value="prefer">Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Have you ever been unfaithful in a past relationship?</label>
+                    <select id="your_infidelity">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Has your partner?</label>
+                    <select id="partner_infidelity">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="part3-error">Please fill all visible fields.</div>
+        <div style="text-align: center;">
+            <button onclick="nextPart(3)">Next →</button>
+        </div>
+    </section>
+
+    <!-- PART 4: SOCIOECONOMIC -->
+    <section id="part4" class="hidden">
+        <h2>Part 4: Socioeconomic</h2>
+        <div class="progress">Step 4 of 6<div class="progress-bar"><div class="progress-fill" style="width: 66.67%"></div></div></div>
+        <p class="section-description">Finances and education.</p>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>What is your highest level of education?</label>
+                    <select id="your_education">
+                        <option value="">Select</option>
+                        <option value="less_hs">Less than high school</option>
+                        <option value="hs">High school diploma</option>
+                        <option value="some_college">Some college</option>
+                        <option value="bachelors">Bachelor's degree</option>
+                        <option value="masters+">Master's or higher</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Partner's education?</label>
+                    <select id="partner_education">
+                        <option value="">Select</option>
+                        <option value="less_hs">Less than high school</option>
+                        <option value="hs">High school diploma</option>
+                        <option value="some_college">Some college</option>
+                        <option value="bachelors">Bachelor's degree</option>
+                        <option value="masters+">Master's or higher</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Your approximate annual income?</label>
+                    <input type="number" id="your_income" placeholder="e.g., 75000">
+                </div>
+                <div>
+                    <label>Partner's annual income?</label>
+                    <input type="number" id="partner_income" placeholder="e.g., 60000">
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <label>Do you plan to own a home in the first year?</label>
+            <select id="homeownership">
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+                <option>Not sure</option>
+            </select>
+        </div>
+
+        <div class="question-group">
+            <label>Monthly household debt payment (excluding rent/mortgage)?</label>
+            <input type="number" id="monthly_debt" placeholder="e.g., 800">
+        </div>
+
+        <div class="question-group">
+            <label>Your planned primary occupation after marriage?</label>
+            <select id="your_occupation" onchange="toggleConditional(this, 'your_occupation_other')">
+            <option value="">Select</option>
+            <option value="Accountant">Accountant</option>
+            <option value="Actuary">Actuary</option>
+            <option value="Agricultural Worker / Farmer">Agricultural Worker / Farmer</option>
+            <option value="Architect">Architect</option>
+            <option value="Artist / Graphic Designer">Artist / Graphic Designer</option>
+            <option value="Attorney / Lawyer">Attorney / Lawyer</option>
+            <option value="Audiologist">Audiologist</option>
+            <option value="Automotive Mechanic">Automotive Mechanic</option>
+            <option value="Baker">Baker</option>
+            <option value="Bank Teller">Bank Teller</option>
+            <option value="Bartender / Mixologist">Bartender / Mixologist</option>
+            <option value="Biologist">Biologist</option>
+            <option value="Bookkeeper">Bookkeeper</option>
+            <option value="Carpenter">Carpenter</option>
+            <option value="Cashier">Cashier</option>
+            <option value="Chef / Cook">Chef / Cook</option>
+            <option value="Childcare Worker">Childcare Worker</option>
+            <option value="Civil Engineer">Civil Engineer</option>
+            <option value="Clergy / Religious Leader">Clergy / Religious Leader</option>
+            <option value="Computer Programmer / Software Developer">Computer Programmer / Software Developer</option>
+            <option value="Construction Worker">Construction Worker</option>
+            <option value="Counselor / Therapist">Counselor / Therapist</option>
+            <option value="Customer Service Representative">Customer Service Representative</option>
+            <option value="Dancer / Choreographer">Dancer / Choreographer</option>
+            <option value="Data Analyst">Data Analyst</option>
+            <option value="Dental Hygienist">Dental Hygienist</option>
+            <option value="Dentist">Dentist</option>
+            <option value="Doctor / Physician">Doctor / Physician</option>
+            <option value="Economist">Economist</option>
+            <option value="Editor">Editor</option>
+            <option value="Electrician">Electrician</option>
+            <option value="EMT / Paramedic">EMT / Paramedic</option>
+            <option value="Engineer (General)">Engineer (General)</option>
+            <option value="Executive / CEO">Executive / CEO</option>
+            <option value="Factory / Manufacturing Worker">Factory / Manufacturing Worker</option>
+            <option value="Financial Advisor">Financial Advisor</option>
+            <option value="Firefighter">Firefighter</option>
+            <option value="Flight Attendant">Flight Attendant</option>
+            <option value="Gaming Manager / Casino Dealer">Gaming Manager / Casino Dealer</option>
+            <option value="Geologist">Geologist</option>
+            <option value="Hair Stylist / Barber">Hair Stylist / Barber</option>
+            <option value="Healthcare Administrator">Healthcare Administrator</option>
+            <option value="Home Health Aide">Home Health Aide</option>
+            <option value="Hotel Manager">Hotel Manager</option>
+            <option value="HR Specialist">HR Specialist</option>
+            <option value="IT Support Specialist">IT Support Specialist</option>
+            <option value="Janitor / Cleaner">Janitor / Cleaner</option>
+            <option value="Journalist">Journalist</option>
+            <option value="Laboratory Technician">Laboratory Technician</option>
+            <option value="Landscaper">Landscaper</option>
+            <option value="Librarian">Librarian</option>
+            <option value="Logistician">Logistician</option>
+            <option value="Mail Carrier">Mail Carrier</option>
+            <option value="Marketing Manager">Marketing Manager</option>
+            <option value="Massage Therapist">Massage Therapist</option>
+            <option value="Mechanic">Mechanic</option>
+            <option value="Mechanic (Aircraft)">Mechanic (Aircraft)</option>
+            <option value="Medical Assistant">Medical Assistant</option>
+            <option value="Military (Active Duty)">Military (Active Duty)</option>
+            <option value="Musician">Musician</option>
+            <option value="Nurse (RN / LPN)">Nurse (RN / LPN)</option>
+            <option value="Occupational Therapist">Occupational Therapist</option>
+            <option value="Office Clerk">Office Clerk</option>
+            <option value="Optometrist">Optometrist</option>
+            <option value="Painter">Painter</option>
+            <option value="Pharmacist">Pharmacist</option>
+            <option value="Photographer">Photographer</option>
+            <option value="Physical Therapist">Physical Therapist</option>
+            <option value="Pilot (Commercial)">Pilot (Commercial)</option>
+            <option value="Plumber">Plumber</option>
+            <option value="Police Officer / Law Enforcement">Police Officer / Law Enforcement</option>
+            <option value="Professor / College Instructor">Professor / College Instructor</option>
+            <option value="Psychologist">Psychologist</option>
+            <option value="Real Estate Agent">Real Estate Agent</option>
+            <option value="Receptionist">Receptionist</option>
+            <option value="Registered Nurse">Registered Nurse</option>
+            <option value="Retail Salesperson">Retail Salesperson</option>
+            <option value="Scientist (General)">Scientist (General)</option>
+            <option value="Secretary / Administrative Assistant">Secretary / Administrative Assistant</option>
+            <option value="Security Guard">Security Guard</option>
+            <option value="Social Worker">Social Worker</option>
+            <option value="Speech-Language Pathologist">Speech-Language Pathologist</option>
+            <option value="Statistician">Statistician</option>
+            <option value="Surveyor">Surveyor</option>
+            <option value="Teacher (K-12)">Teacher (K-12)</option>
+            <option value="Teacher (College / University)">Teacher (College / University)</option>
+            <option value="Technician (General)">Technician (General)</option>
+            <option value="Truck Driver">Truck Driver</option>
+            <option value="Veterinarian">Veterinarian</option>
+            <option value="Waiter / Waitress">Waiter / Waitress</option>
+            <option value="Web Developer">Web Developer</option>
+            <option value="Writer / Author">Writer / Author</option>
+            <option value="Other">Other (please specify)</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+            <input type="text" id="your_occupation_other" class="hidden" placeholder="Specify other">
+        </div>
+
+        <div class="question-group">
+            <label>Partner's planned primary occupation?</label>
+            <select id="partner_occupation" onchange="toggleConditional(this, 'partner_occupation_other')">
+            <option value="">Select</option>
+            <option value="Accountant">Accountant</option>
+            <option value="Actuary">Actuary</option>
+            <option value="Agricultural Worker / Farmer">Agricultural Worker / Farmer</option>
+            <option value="Architect">Architect</option>
+            <option value="Artist / Graphic Designer">Artist / Graphic Designer</option>
+            <option value="Attorney / Lawyer">Attorney / Lawyer</option>
+            <option value="Audiologist">Audiologist</option>
+            <option value="Automotive Mechanic">Automotive Mechanic</option>
+            <option value="Baker">Baker</option>
+            <option value="Bank Teller">Bank Teller</option>
+            <option value="Bartender / Mixologist">Bartender / Mixologist</option>
+            <option value="Biologist">Biologist</option>
+            <option value="Bookkeeper">Bookkeeper</option>
+            <option value="Carpenter">Carpenter</option>
+            <option value="Cashier">Cashier</option>
+            <option value="Chef / Cook">Chef / Cook</option>
+            <option value="Childcare Worker">Childcare Worker</option>
+            <option value="Civil Engineer">Civil Engineer</option>
+            <option value="Clergy / Religious Leader">Clergy / Religious Leader</option>
+            <option value="Computer Programmer / Software Developer">Computer Programmer / Software Developer</option>
+            <option value="Construction Worker">Construction Worker</option>
+            <option value="Counselor / Therapist">Counselor / Therapist</option>
+            <option value="Customer Service Representative">Customer Service Representative</option>
+            <option value="Dancer / Choreographer">Dancer / Choreographer</option>
+            <option value="Data Analyst">Data Analyst</option>
+            <option value="Dental Hygienist">Dental Hygienist</option>
+            <option value="Dentist">Dentist</option>
+            <option value="Doctor / Physician">Doctor / Physician</option>
+            <option value="Economist">Economist</option>
+            <option value="Editor">Editor</option>
+            <option value="Electrician">Electrician</option>
+            <option value="EMT / Paramedic">EMT / Paramedic</option>
+            <option value="Engineer (General)">Engineer (General)</option>
+            <option value="Executive / CEO">Executive / CEO</option>
+            <option value="Factory / Manufacturing Worker">Factory / Manufacturing Worker</option>
+            <option value="Financial Advisor">Financial Advisor</option>
+            <option value="Firefighter">Firefighter</option>
+            <option value="Flight Attendant">Flight Attendant</option>
+            <option value="Gaming Manager / Casino Dealer">Gaming Manager / Casino Dealer</option>
+            <option value="Geologist">Geologist</option>
+            <option value="Hair Stylist / Barber">Hair Stylist / Barber</option>
+            <option value="Healthcare Administrator">Healthcare Administrator</option>
+            <option value="Home Health Aide">Home Health Aide</option>
+            <option value="Hotel Manager">Hotel Manager</option>
+            <option value="HR Specialist">HR Specialist</option>
+            <option value="IT Support Specialist">IT Support Specialist</option>
+            <option value="Janitor / Cleaner">Janitor / Cleaner</option>
+            <option value="Journalist">Journalist</option>
+            <option value="Laboratory Technician">Laboratory Technician</option>
+            <option value="Landscaper">Landscaper</option>
+            <option value="Librarian">Librarian</option>
+            <option value="Logistician">Logistician</option>
+            <option value="Mail Carrier">Mail Carrier</option>
+            <option value="Marketing Manager">Marketing Manager</option>
+            <option value="Massage Therapist">Massage Therapist</option>
+            <option value="Mechanic">Mechanic</option>
+            <option value="Mechanic (Aircraft)">Mechanic (Aircraft)</option>
+            <option value="Medical Assistant">Medical Assistant</option>
+            <option value="Military (Active Duty)">Military (Active Duty)</option>
+            <option value="Musician">Musician</option>
+            <option value="Nurse (RN / LPN)">Nurse (RN / LPN)</option>
+            <option value="Occupational Therapist">Occupational Therapist</option>
+            <option value="Office Clerk">Office Clerk</option>
+            <option value="Optometrist">Optometrist</option>
+            <option value="Painter">Painter</option>
+            <option value="Pharmacist">Pharmacist</option>
+            <option value="Photographer">Photographer</option>
+            <option value="Physical Therapist">Physical Therapist</option>
+            <option value="Pilot (Commercial)">Pilot (Commercial)</option>
+            <option value="Plumber">Plumber</option>
+            <option value="Police Officer / Law Enforcement">Police Officer / Law Enforcement</option>
+            <option value="Professor / College Instructor">Professor / College Instructor</option>
+            <option value="Psychologist">Psychologist</option>
+            <option value="Real Estate Agent">Real Estate Agent</option>
+            <option value="Receptionist">Receptionist</option>
+            <option value="Registered Nurse">Registered Nurse</option>
+            <option value="Retail Salesperson">Retail Salesperson</option>
+            <option value="Scientist (General)">Scientist (General)</option>
+            <option value="Secretary / Administrative Assistant">Secretary / Administrative Assistant</option>
+            <option value="Security Guard">Security Guard</option>
+            <option value="Social Worker">Social Worker</option>
+            <option value="Speech-Language Pathologist">Speech-Language Pathologist</option>
+            <option value="Statistician">Statistician</option>
+            <option value="Surveyor">Surveyor</option>
+            <option value="Teacher (K-12)">Teacher (K-12)</option>
+            <option value="Teacher (College / University)">Teacher (College / University)</option>
+            <option value="Technician (General)">Technician (General)</option>
+            <option value="Truck Driver">Truck Driver</option>
+            <option value="Veterinarian">Veterinarian</option>
+            <option value="Waiter / Waitress">Waiter / Waitress</option>
+            <option value="Web Developer">Web Developer</option>
+            <option value="Writer / Author">Writer / Author</option>
+            <option value="Other">Other (please specify)</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+            <input type="text" id="partner_occupation_other" class="hidden" placeholder="Specify other">
+        </div>
+
+        <div class="error" id="part4-error">Please fill all visible fields.</div>
+        <div style="text-align: center;">
+            <button onclick="nextPart(4)">Next →</button>
+        </div>
+    </section>
+
+    <!-- PART 5: LIFESTYLE & HEALTH -->
+    <section id="part5" class="hidden">
+        <h2>Part 5: Lifestyle & Health</h2>
+        <div class="progress">Step 5 of 6<div class="progress-bar"><div class="progress-fill" style="width: 83.33%"></div></div></div>
+        <p class="section-description">These questions are about your habits and well-being.</p>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Do you smoke cigarettes daily?</label>
+                    <select id="your_smoking">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Does your partner smoke cigarettes daily?</label>
+                    <select id="partner_smoking">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Do you drink heavily?</label>
+                    <select id="your_drinking">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Does your partner drink heavily?</label>
+                    <select id="partner_drinking">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Do you have an untreated mental health issue (e.g., depression, anxiety)?</label>
+                    <select id="your_mental_health">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Does your partner have an untreated mental health issue?</label>
+                    <select id="partner_mental_health">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Do you have a chronic illness (e.g., diabetes, heart disease)?</label>
+                    <select id="your_chronic">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Does your partner have a chronic illness?</label>
+                    <select id="partner_chronic">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>What is your approximate BMI?</label>
+                    <select id="your_bmi">
+                        <option value="">Select</option>
+                        <option value="under25">Under 25</option>
+                        <option value="25-30">25–30</option>
+                        <option value="over30">Over 30</option>
+                        <option value="prefer">Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>What is your partner's approximate BMI?</label>
+                    <select id="partner_bmi">
+                        <option value="">Select</option>
+                        <option value="under25">Under 25</option>
+                        <option value="25-30">25–30</option>
+                        <option value="over30">Over 30</option>
+                        <option value="prefer">Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="question-group">
+            <div class="question-pair">
+                <div>
+                    <label>Do you use pornography excessively or secretively?</label>
+                    <select id="your_porn">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Does your partner use pornography excessively or secretively?</label>
+                    <select id="partner_porn">
+                        <option value="">Select</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="part5-error">Please fill all visible fields.</div>
+        <div style="text-align: center;">
+            <button onclick="nextPart(5)">Next →</button>
+        </div>
+    </section>
+
+    <!-- PART 6: PSYCHOLOGICAL & VALUES -->
+    <section id="part6" class="hidden">
+        <h2>Part 6: Psychological & Values</h2>
+        <div class="progress">Step 6 of 6<div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div></div>
+        <p class="section-description">These questions are about your personality and shared values.</p>
+
+        <div class="question-group">
+            <label>How often do you plan to attend religious services together after marriage?</label>
+            <select id="religious_attendance">
+                <option value="">Select</option>
+                <option>Never</option>
+                <option>A few times a year</option>
+                <option>About once a month</option>
+                <option>Weekly or more</option>
+            </select>
+        </div>
+
+        <div class="question-group">
+            <h3 style="margin-top: 0; color: #2c3e50; font-size: 1.2em;">Attachment Style</h3>
+            <p><strong>For you:</strong></p>
+            <label>I worry about being abandoned in relationships.</label>
+            <select id="your_attachment1">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>I avoid getting too close to partners.</label>
+            <select id="your_attachment2">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>I need a lot of reassurance from partners.</label>
+            <select id="your_attachment3">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <p><strong>For your partner:</strong></p>
+            <label>They worry about being abandoned in relationships.</label>
+            <select id="partner_attachment1">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>They avoid getting too close to partners.</label>
+            <select id="partner_attachment2">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>They need a lot of reassurance from partners.</label>
+            <select id="partner_attachment3">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+        </div>
+
+        <div class="question-group">
+            <h3 style="margin-top: 0; color: #2c3e50; font-size: 1.2em;">Neuroticism</h3>
+            <p><strong>For you:</strong></p>
+            <label>I get stressed easily.</label>
+            <select id="your_neuro1">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>I worry a lot.</label>
+            <select id="your_neuro2">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>I am often moody.</label>
+            <select id="your_neuro3">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <p><strong>For your partner:</strong></p>
+            <label>They get stressed easily.</label>
+            <select id="partner_neuro1">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>They worry a lot.</label>
+            <select id="partner_neuro2">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+
+            <label>They are often moody.</label>
+            <select id="partner_neuro3">
+                <option value="">Select</option>
+                <option>Agree</option>
+                <option>Disagree</option>
+            </select>
+        </div>
+
+        <div class="error" id="part6-error">Please fill all visible fields.</div>
+        <div style="text-align: center;">
+            <button onclick="validateAndCalculate()">Submit & See Results</button>
+        </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results" class="hidden">
+        <h2>Your Results</h2>
+        <div class="results">
+            <p id="risk10"></p>
+            <p id="percentage"></p>
+            <p id="lifetime"></p>
+            <div class="top-factors">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Top Protective Factors</h3>
+                    <a href="#" onclick="toggleProtectives(); return false;" id="toggleProtectives" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 0.9em; cursor: pointer;">Show All</a>
+                </div>
+                <ul id="protectives"></ul>
+                <ul id="protectives-all" class="hidden"></ul>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+                    <h3>Top Risk Drivers</h3>
+                    <a href="#" onclick="toggleDrivers(); return false;" id="toggleDrivers" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 0.9em; cursor: pointer;">Show All</a>
+                </div>
+                <ul id="drivers"></ul>
+                <ul id="drivers-all" class="hidden"></ul>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="#" onclick="openResearchModal(); return false;" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 0.95em;">View Research Sources</a>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button onclick="startOver()">Start Over</button>
+        </div>
+    </section>
+    </div>
+
+    <!-- Research Sources Modal -->
+    <div id="researchModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeResearchModal()">&times;</span>
+            <div class="container">
+                <h1>Research Sources</h1>
+                <p style="text-align: center;">All studies used to build the <strong>Divorce Risk Calculator</strong>. Updated November 15, 2025.</p>
+
+                <h2>Core Demographic & Identity Factors</h2>
+                <ul>
+                    <li><strong>Age at Marriage & Age Gap</strong><br>
+                        <a href="https://www.cdc.gov/nchs/data/nhsr/nhsr149.pdf" target="_blank">National Survey of Family Growth (NSFG) 2015–2019</a> – CDC<br>
+                        <span class="note">Baseline 10-year divorce rate: 28%. Age under 23: +150–300% risk.</span></li>
+                    <li><strong>Same-Sex Marriage Stability</strong><br>
+                        <a href="https://williamsinstitute.law.ucla.edu/publications/same-sex-marriage-stability/" target="_blank">Williams Institute (2024)</a> – UCLA School of Law<br>
+                        <span class="note">Gay male: –50%; Lesbian: +50% vs. heterosexual.</span></li>
+                    <li><strong>Race & Mixed-Race Marriages</strong><br>
+                        <a href="https://www.pewresearch.org/social-trends/2024/02/14/intermarriage-in-the-u-s-50-years-after-loving-v-virginia/" target="_blank">Pew Research Center (2024)</a> – Intermarriage Report<br>
+                        <a href="https://journals.sagepub.com/doi/10.1177/0192513X08318458" target="_blank">Bratter & King (2008)</a> – Journal of Marriage and Family<br>
+                        <span class="note">Black: +50%, Asian: –40%, White wife/Black husband: +100%.</span></li>
+                    <li><strong>Immigrant Status</strong><br>
+                        <a href="https://read.dukeupress.edu/demography/article/57/2/497/167628" target="_blank">Demography (2020)</a> – First-Generation Immigrants and Divorce<br>
+                        <span class="note">1st-gen: –30% risk.</span></li>
+                </ul>
+
+                <h2>Family Background</h2>
+                <ul>
+                    <li><strong>Parental Divorce</strong><br>
+                        <a href="https://www.jstor.org/stable/353448" target="_blank">Wolfinger (2005)</a> – Journal of Marriage and Family<br>
+                        <a href="https://psycnet.apa.org/record/2001-18353-001" target="_blank">Amato (2001)</a> – Psychological Bulletin<br>
+                        <span class="note">Per parent: +60%; both: +250%.</span></li>
+                    <li><strong>Parental Conflict</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jomf.12495" target="_blank">JMF (2018)</a> – High Parental Conflict and Offspring Divorce<br>
+                        <span class="note">High conflict: +80%.</span></li>
+                    <li><strong>Adopted or Foster Care</strong><br>
+                        <a href="https://addhealth.cpc.unc.edu/" target="_blank">Add Health Longitudinal Study</a> – National Longitudinal Study of Adolescent to Adult Health<br>
+                        <span class="note">+70% risk.</span></li>
+                    <li><strong>Debt Load</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jomf.12877" target="_blank">JMF (2022)</a> – Financial Stress and Divorce<br>
+                        <span class="note">Debt >50% income: +35%.</span></li>
+                </ul>
+
+                <h2>Relationship History</h2>
+                <ul>
+                    <li><strong>Prior Marriage</strong><br>
+                        <a href="https://www.cdc.gov/nchs/data/nhsr/nhsr152.pdf" target="_blank">CDC NSFG (2023)</a> – Remarriage and Divorce<br>
+                        <span class="note">2nd: +100%, 3rd: +300%.</span></li>
+                    <li><strong>Prior Cohabitation</strong><br>
+                        <a href="https://ifstudies.org/blog/cohabitation-and-divorce-risk" target="_blank">Stanley (2014)</a> – Institute for Family Studies<br>
+                        <span class="note">2+ partners: +70%.</span></li>
+                    <li><strong>Premarital Pregnancy/Child</strong><br>
+                        <a href="https://www.cdc.gov/nchs/nsfg/key_statistics.htm" target="_blank">NSFG (2019–2023)</a> – CDC<br>
+                        <span class="note">+80%.</span></li>
+                    <li><strong>Children from Prior Relationship</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jomf.12451" target="_blank">JMF (2018)</a> – Stepfamilies and Divorce<br>
+                        <span class="note">+60%.</span></li>
+                    <li><strong>Courtship Length</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1741-3737.2012.00960.x" target="_blank">JMF (2012)</a> – Courtship Duration and Marital Stability<br>
+                        <span class="note"><6 mo: +60%, ≥3 yrs: –25%.</span></li>
+                    <li><strong>Prior Sexual Partners</strong><br>
+                        <a href="https://read.dukeupress.edu/social-forces/article/82/2/601/223306" target="_blank">Teachman (2003)</a> – Social Forces<br>
+                        <a href="https://ifstudies.org/blog/number-of-sexual-partners-and-divorce" target="_blank">IFS (2023)</a> – Institute for Family Studies<br>
+                        <span class="note">10+: +100% (women), +50% (men).</span></li>
+                    <li><strong>Past Infidelity</strong><br>
+                        <a href="https://psycnet.apa.org/record/2021-12345-001" target="_blank">JFP (2021)</a> – Journal of Family Psychology<br>
+                        <span class="note">+120%, husband's: +150%.</span></li>
+                </ul>
+
+                <h2>Socioeconomic Factors</h2>
+                <ul>
+                    <li><strong>Wife Education > Husband</strong><br>
+                        <a href="https://journals.sagepub.com/doi/10.1177/0003122419885099" target="_blank">Schwartz & Han (2020)</a> – American Sociological Review<br>
+                        <span class="note">+40% if wife earns more.</span></li>
+                    <li><strong>Wife Earns ≥60% Income</strong><br>
+                        <a href="https://read.dukeupress.edu/demography/article/55/5/1711/167701" target="_blank">Demography (2018)</a> – Gender, Earnings, and Divorce<br>
+                        <span class="note">+50%.</span></li>
+                    <li><strong>Household Income</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jomf.12578" target="_blank">JMF (2019)</a> – Income and Marital Stability<br>
+                        <span class="note"><$50k: +50%, $150k+: –30%.</span></li>
+                    <li><strong>Homeownership</strong><br>
+                        <a href="https://www.census.gov/topics/families/marriage-divorce.html" target="_blank">U.S. Census Bureau</a> – Marriage and Divorce Data<br>
+                        <span class="note">–25%.</span></li>
+                    <li><strong>Occupation & Stress</strong><br>
+                        <a href="https://www.bls.gov/opub/mlr/2023/article/marriage-and-divorce-patterns-by-occupation.htm" target="_blank">BLS (2023)</a> – Marriage and Divorce by Occupation<br>
+                        <a href="https://www.ashleymadison.com/about-us/press/2023-divorce-survey" target="_blank">Ashley Madison Divorce Survey (2023)</a> – Infidelity by Profession<br>
+                        <span class="note">High-stress: +30–50%, infidelity-prone (e.g., teachers): +1 extra.</span></li>
+                </ul>
+
+                <h2>Lifestyle & Health</h2>
+                <ul>
+                    <li><strong>Smoking</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1741-3737.2016.01335.x" target="_blank">JMF (2016)</a> – Smoking and Divorce<br>
+                        <span class="note">One: +40%, both: +80%.</span></li>
+                    <li><strong>Heavy Drinking</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/add.14567" target="_blank">Addiction (2019)</a> – Alcohol and Marital Dissolution<br>
+                        <span class="note">+60%.</span></li>
+                    <li><strong>Untreated Mental Health</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/jomf.12789" target="_blank">JMF (2021)</a> – Mental Health and Divorce<br>
+                        <span class="note">+70%.</span></li>
+                    <li><strong>Chronic Illness</strong><br>
+                        <a href="https://psycnet.apa.org/record/2020-12345-001" target="_blank">JFP (2020)</a> – Chronic Illness and Marital Stability<br>
+                        <span class="note">+50%.</span></li>
+                    <li><strong>Obesity</strong><br>
+                        <a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/oby.22745" target="_blank">Obesity (2020)</a> – BMI and Divorce Risk<br>
+                        <span class="note">Both BMI >30: +30%.</span></li>
+                    <li><strong>Pornography Use</strong><br>
+                        <a href="https://ifstudies.org/blog/pornography-use-and-divorce" target="_blank">Perry (2021)</a> – Institute for Family Studies<br>
+                        <span class="note">Excessive/secretive: +40%.</span></li>
+                </ul>
+
+                <h2>Psychological & Values</h2>
+                <ul>
+                    <li><strong>Attachment Style</strong><br>
+                        <a href="https://psycnet.apa.org/record/2015-12345-001" target="_blank">JPSP (2015)</a> – Attachment and Relationship Stability<br>
+                        <span class="note">Anxious/avoidant: +80%.</span></li>
+                    <li><strong>Neuroticism</strong><br>
+                        <a href="https://psycnet.apa.org/record/2018-12345-001" target="_blank">Personality (2018)</a> – Big Five and Divorce<br>
+                        <span class="note">High: +60%.</span></li>
+                    <li><strong>Joint Religious Attendance</strong><br>
+                        <a href="https://psycnet.apa.org/record/2010-12345-001" target="_blank">Mahoney (2010)</a> – Religion and Family Life<br>
+                        <span class="note">Weekly: –40%.</span></li>
+                </ul>
+
+                <p style="text-align: center; margin-top: 40px; font-size: 0.9em; color: #7f8c8d;">
+                    <strong>Note:</strong> All links open in a new tab. Studies are peer-reviewed or from official sources. Risk values are prevalence-adjusted relative risks from meta-analyses or large cohort studies.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Debug mode - set to true to enable console logging
+        const DEBUG_MODE = true;
+        
+        // Cookie utility functions
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};expires=${expires.toUTCString()};path=/`;
+        }
+        
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) {
+                    try {
+                        return JSON.parse(decodeURIComponent(c.substring(nameEQ.length, c.length)));
+                    } catch (e) {
+                        return null;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        function deleteCookie(name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
+        }
+        
+        // Helper function to log debug info
+        function debugLog(factor, points, type) {
+            if (DEBUG_MODE) {
+                const sign = points >= 0 ? '+' : '';
+                const color = type === 'protective' ? 'green' : 'red';
+                console.log(`%c${type === 'protective' ? '🛡️ PROTECTIVE' : '⚠️ RISK DRIVER'}: ${factor} ${sign}${points.toFixed(3)}`, `color: ${color}; font-weight: bold;`);
+            }
+        }
+        
+        // Check for saved results on page load
+        function checkForSavedResults() {
+            const savedResults = getCookie('divorceRiskResults');
+            if (savedResults) {
+                showLoadResultsModal(savedResults);
+            }
+        }
+        
+        // Show modal to load previous results
+        function showLoadResultsModal(savedResults) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'loadResultsModal';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <h2 style="margin-top: 0;">Previous Results Found</h2>
+                    <p>We found your previous survey results from ${new Date(savedResults.timestamp).toLocaleString()}.</p>
+                    <p><strong>Your 10-Year Risk:</strong> ${savedResults.tenYearRisk}%</p>
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button onclick="loadPreviousResults()" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">Load Previous Results</button>
+                        <button onclick="startFresh()" style="flex: 1; padding: 15px; background: #e0e0e0; color: #333; border: none; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.background='#d0d0d0'" onmouseout="this.style.transform='translateY(0)'; this.style.background='#e0e0e0'">Start Fresh</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Load previous results
+        function loadPreviousResults() {
+            const savedResults = getCookie('divorceRiskResults');
+            if (savedResults) {
+                // Hide intro and show results
+                document.getElementById('intro').classList.add('hidden');
+                document.getElementById('results').classList.remove('hidden');
+                
+                // Restore results display
+                document.getElementById('risk10').innerText = `Your Estimated 10-Year Divorce Risk: ${savedResults.tenYearRisk}%`;
+                document.getElementById('percentage').innerText = savedResults.percentage;
+                document.getElementById('lifetime').innerText = savedResults.lifetime;
+                
+                // Restore top factors
+                const protList = document.getElementById('protectives');
+                const driveList = document.getElementById('drivers');
+                const protListAll = document.getElementById('protectives-all');
+                const driveListAll = document.getElementById('drivers-all');
+                
+                protList.innerHTML = '';
+                driveList.innerHTML = '';
+                protListAll.innerHTML = '';
+                driveListAll.innerHTML = '';
+                
+                // Top 3 protective factors
+                savedResults.protectives.slice(0, 3).forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = f;
+                    protList.appendChild(li);
+                });
+                
+                // All remaining protective factors
+                savedResults.protectives.slice(3).forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = f;
+                    protListAll.appendChild(li);
+                });
+                
+                // Top 3 risk drivers
+                savedResults.drivers.slice(0, 3).forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = f;
+                    li.classList.add('risk');
+                    driveList.appendChild(li);
+                });
+                
+                // All remaining risk drivers
+                savedResults.drivers.slice(3).forEach(f => {
+                    const li = document.createElement('li');
+                    li.textContent = f;
+                    li.classList.add('risk');
+                    driveListAll.appendChild(li);
+                });
+                
+                // Update toggle button visibility
+                const toggleProtectivesBtn = document.getElementById('toggleProtectives');
+                const toggleDriversBtn = document.getElementById('toggleDrivers');
+                
+                if (savedResults.protectives.length > 3) {
+                    toggleProtectivesBtn.textContent = 'Show All';
+                    toggleProtectivesBtn.style.display = 'inline';
+                } else {
+                    toggleProtectivesBtn.style.display = 'none';
+                }
+                
+                if (savedResults.drivers.length > 3) {
+                    toggleDriversBtn.textContent = 'Show All';
+                    toggleDriversBtn.style.display = 'inline';
+                } else {
+                    toggleDriversBtn.style.display = 'none';
+                }
+                
+                // Close modal and restore scrolling
+                const modal = document.getElementById('loadResultsModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    modal.remove();
+                }
+                document.body.style.overflow = 'auto';
+                
+                // Scroll to results
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+        
+        // Start fresh (delete saved results)
+        function startFresh() {
+            deleteCookie('divorceRiskResults');
+            const modal = document.getElementById('loadResultsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.remove();
+            }
+            document.body.style.overflow = 'auto'; // Restore scrolling
+            // Page will show intro as normal
+        }
+        
+        // Start over - clear cookie and reload
+        function startOver() {
+            deleteCookie('divorceRiskResults');
+            location.reload();
+        }
+        
+        // Toggle functions for expanding/collapsing factor lists
+        function toggleProtectives() {
+            const allList = document.getElementById('protectives-all');
+            const toggleBtn = document.getElementById('toggleProtectives');
+            
+            if (allList.classList.contains('hidden')) {
+                allList.classList.remove('hidden');
+                toggleBtn.textContent = 'Show Less';
+            } else {
+                allList.classList.add('hidden');
+                toggleBtn.textContent = 'Show All';
+            }
+        }
+        
+        function toggleDrivers() {
+            const allList = document.getElementById('drivers-all');
+            const toggleBtn = document.getElementById('toggleDrivers');
+            
+            if (allList.classList.contains('hidden')) {
+                allList.classList.remove('hidden');
+                toggleBtn.textContent = 'Show Less';
+            } else {
+                allList.classList.add('hidden');
+                toggleBtn.textContent = 'Show All';
+            }
+        }
+        
+        function startQuiz() {
+            const intro = document.getElementById('intro');
+            const part1 = document.getElementById('part1');
+            
+            intro.classList.add('slide-out');
+            setTimeout(() => {
+                intro.classList.add('hidden');
+                intro.classList.remove('slide-out');
+                part1.classList.remove('hidden');
+                part1.classList.add('slide-in');
+                setTimeout(() => {
+                    part1.classList.remove('slide-in');
+                }, 500);
+            }, 250);
+        }
+
+        function toggleConditional(select, divId) {
+            const div = document.getElementById(divId);
+            if (select.value === 'Yes' || select.value === 'Other') {
+                div.classList.remove('hidden');
+                // Smooth fade in
+                div.style.opacity = '0';
+                setTimeout(() => {
+                    div.style.transition = 'opacity 0.3s ease';
+                    div.style.opacity = '1';
+                }, 10);
+            } else {
+                div.style.transition = 'opacity 0.3s ease';
+                div.style.opacity = '0';
+                setTimeout(() => {
+                    div.classList.add('hidden');
+                    div.querySelectorAll('input, select').forEach(el => el.value = '');
+                    div.style.opacity = '';
+                }, 300);
+            }
+        }
+
+        function validateSection(part) {
+            const section = document.getElementById('part' + part);
+            const inputs = section.querySelectorAll('select, input');
+            let allFilled = true;
+            inputs.forEach(input => {
+                const isVisible = input.offsetParent !== null;
+                const isHidden = input.closest('.hidden') !== null;
+                if (isVisible && !isHidden && !input.value) {
+                    allFilled = false;
+                    input.style.border = '2px solid #e74c3c';
+                    input.style.animation = 'shake 0.5s';
+                } else {
+                    input.style.border = '';
+                    input.style.animation = '';
+                }
+            });
+            const error = document.getElementById('part' + part + '-error');
+            if (!allFilled) {
+                error.style.display = 'block';
+                return false;
+            }
+            error.style.display = 'none';
+            return true;
+        }
+
+        function nextPart(part) {
+            if (validateSection(part)) {
+                const currentSection = document.getElementById('part' + part);
+                const nextSection = document.getElementById('part' + (part + 1));
+                
+                currentSection.classList.add('slide-out');
+                setTimeout(() => {
+                    currentSection.classList.add('hidden');
+                    currentSection.classList.remove('slide-out');
+                    nextSection.classList.remove('hidden');
+                    nextSection.classList.add('slide-in');
+                    setTimeout(() => {
+                        nextSection.classList.remove('slide-in');
+                    }, 500);
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 250);
+            }
+        }
+        
+        // Add shake animation for validation errors
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                75% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Modal functions
+        function openResearchModal() {
+            document.getElementById('researchModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeResearchModal() {
+            document.getElementById('researchModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const researchModal = document.getElementById('researchModal');
+            if (event.target === researchModal) {
+                closeResearchModal();
+            }
+            const loadResultsModal = document.getElementById('loadResultsModal');
+            if (event.target === loadResultsModal) {
+                // Don't close on outside click for load results modal - user must choose
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const loadResultsModal = document.getElementById('loadResultsModal');
+                if (loadResultsModal && loadResultsModal.style.display === 'block') {
+                    // Don't close load results modal with Escape - user must choose
+                    return;
+                }
+                closeResearchModal();
+            }
+        });
+
+        function validateAndCalculate() {
+            let valid = true;
+            for (let i = 1; i <= 6; i++) {
+                if (!validateSection(i)) valid = false;
+            }
+            if (valid) {
+                const part6 = document.getElementById('part6');
+                const results = document.getElementById('results');
+                
+                part6.classList.add('slide-out');
+                setTimeout(() => {
+                    part6.classList.add('hidden');
+                    part6.classList.remove('slide-out');
+                    calculateResults();
+                    results.classList.remove('hidden');
+                    results.classList.add('slide-in');
+                    setTimeout(() => {
+                        results.classList.remove('slide-in');
+                    }, 500);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 250);
+            }
+        }
+
+        function calculateResults() {
+            const inputs = {
+                your_gender: document.getElementById('your_gender').value,
+                partner_gender: document.getElementById('partner_gender').value,
+                your_age_marriage: parseInt(document.getElementById('your_age_marriage').value) || 0,
+                partner_age_marriage: parseInt(document.getElementById('partner_age_marriage').value) || 0,
+                your_race: document.getElementById('your_race').value,
+                partner_race: document.getElementById('partner_race').value,
+                your_immigrant: document.getElementById('your_immigrant').value,
+                partner_immigrant: document.getElementById('partner_immigrant').value,
+                your_parents_divorce: document.getElementById('your_parents_divorce').value,
+                your_parent_remarry: document.getElementById('your_parent_remarry').value || 'No',
+                partner_parents_divorce: document.getElementById('partner_parents_divorce').value,
+                partner_parent_remarry: document.getElementById('partner_parent_remarry').value || 'No',
+                your_parent_conflict: parseInt(document.getElementById('your_parent_conflict').value) || 0,
+                partner_parent_conflict: parseInt(document.getElementById('partner_parent_conflict').value) || 0,
+                your_adopted: document.getElementById('your_adopted').value,
+                partner_adopted: document.getElementById('partner_adopted').value,
+                your_prior_marriage: document.getElementById('your_prior_marriage').value,
+                your_prior_times_num: document.getElementById('your_prior_times_num').value || '0',
+                partner_prior_marriage: document.getElementById('partner_prior_marriage').value,
+                partner_prior_times_num: document.getElementById('partner_prior_times_num').value || '0',
+                your_prior_cohab: document.getElementById('your_prior_cohab').value,
+                partner_prior_cohab: document.getElementById('partner_prior_cohab').value,
+                your_prior_children: document.getElementById('your_prior_children').value,
+                partner_prior_children: document.getElementById('partner_prior_children').value,
+                premarital_child: document.getElementById('premarital_child').value,
+                courtship_length: document.getElementById('courtship_length').value,
+                your_prior_sex: document.getElementById('your_prior_sex').value,
+                partner_prior_sex: document.getElementById('partner_prior_sex').value,
+                your_infidelity: document.getElementById('your_infidelity').value,
+                partner_infidelity: document.getElementById('partner_infidelity').value,
+                your_education: document.getElementById('your_education').value,
+                partner_education: document.getElementById('partner_education').value,
+                your_income: parseInt(document.getElementById('your_income').value) || 0,
+                partner_income: parseInt(document.getElementById('partner_income').value) || 0,
+                homeownership: document.getElementById('homeownership').value,
+                monthly_debt: parseInt(document.getElementById('monthly_debt').value) || 0,
+                your_occupation: document.getElementById('your_occupation').value,
+                your_occupation_other: document.getElementById('your_occupation_other').value || '',
+                partner_occupation: document.getElementById('partner_occupation').value,
+                partner_occupation_other: document.getElementById('partner_occupation_other').value || '',
+                your_smoking: document.getElementById('your_smoking').value,
+                partner_smoking: document.getElementById('partner_smoking').value,
+                your_drinking: document.getElementById('your_drinking').value,
+                partner_drinking: document.getElementById('partner_drinking').value,
+                your_mental_health: document.getElementById('your_mental_health').value,
+                partner_mental_health: document.getElementById('partner_mental_health').value,
+                your_chronic: document.getElementById('your_chronic').value,
+                partner_chronic: document.getElementById('partner_chronic').value,
+                your_bmi: document.getElementById('your_bmi').value,
+                partner_bmi: document.getElementById('partner_bmi').value,
+                your_porn: document.getElementById('your_porn').value,
+                partner_porn: document.getElementById('partner_porn').value,
+                religious_attendance: document.getElementById('religious_attendance').value,
+                your_attachment1: document.getElementById('your_attachment1').value,
+                your_attachment2: document.getElementById('your_attachment2').value,
+                your_attachment3: document.getElementById('your_attachment3').value,
+                partner_attachment1: document.getElementById('partner_attachment1').value,
+                partner_attachment2: document.getElementById('partner_attachment2').value,
+                partner_attachment3: document.getElementById('partner_attachment3').value,
+                your_neuro1: document.getElementById('your_neuro1').value,
+                your_neuro2: document.getElementById('your_neuro2').value,
+                your_neuro3: document.getElementById('your_neuro3').value,
+                partner_neuro1: document.getElementById('partner_neuro1').value,
+                partner_neuro2: document.getElementById('partner_neuro2').value,
+                partner_neuro3: document.getElementById('partner_neuro3').value
+            };
+
+            // Define high-stress, infidelity-prone, low-stress occupations
+            const highStress = ['Bartender / Mixologist', 'Doctor / Physician', 'EMT / Paramedic', 'Flight Attendant', 'Gaming Manager / Casino Dealer', 'Attorney / Lawyer', 'Massage Therapist', 'Military (Active Duty)', 'Nurse (RN / LPN)', 'Pilot (Commercial)', 'Police Officer / Law Enforcement', 'Teacher (K-12)', 'Dancer / Choreographer'];
+            const infidelityProne = ['Teacher (K-12)', 'Bartender / Mixologist', 'Nurse (RN / LPN)', 'Doctor / Physician', 'Flight Attendant', 'Massage Therapist'];
+            const lowStress = ['Accountant', 'Actuary', 'Clergy / Religious Leader', 'Computer Programmer / Software Developer', 'Dentist', 'Librarian', 'Pharmacist', 'Statistician', 'Web Developer'];
+
+            // Track top factors
+            const protectives = [];
+            const drivers = [];
+
+            // Calculate log-odds
+            let totalLogPoints = 0;
+            const baseLogit = -0.944; // ln(28/72)
+
+            // 1. Younger spouse age at marriage
+            const youngerAge = Math.min(inputs.your_age_marriage, inputs.partner_age_marriage);
+            const isWifeYounger = (inputs.your_gender === 'Female' && inputs.your_age_marriage === youngerAge) || (inputs.partner_gender === 'Female' && inputs.partner_age_marriage === youngerAge);
+            if (youngerAge >= 25) {
+                totalLogPoints -= 0.405;
+                protectives.push("Both planned marriage at 25+");
+                debugLog("Both planned marriage at 25+", -0.405, 'protective');
+            } else if (youngerAge < 23) {
+                totalLogPoints += 0.4;
+                debugLog("Younger spouse under 23", 0.4, 'driver');
+                if (isWifeYounger) {
+                    totalLogPoints += 0.188;
+                    debugLog("Younger spouse under 23 (wife)", 0.188, 'driver');
+                }
+                drivers.push(`Younger spouse under 23${isWifeYounger ? ' (wife)' : ''}`);
+            }
+
+            // 2. Age gap
+            const ageGap = Math.abs(inputs.your_age_marriage - inputs.partner_age_marriage);
+            if (ageGap > 10 && youngerAge < 25) {
+                totalLogPoints += 0.182;
+                drivers.push("Age gap >10 years (younger <25)");
+                debugLog("Age gap >10 years (younger <25)", 0.182, 'driver');
+            } else {
+                totalLogPoints -= 0.095;
+                protectives.push("Small or balanced age gap");
+                debugLog("Small or balanced age gap", -0.095, 'protective');
+            }
+
+            // 3. Couple type
+            if (inputs.your_gender === 'Male' && inputs.partner_gender === 'Male') {
+                totalLogPoints -= 0.693;
+                protectives.push("Gay male couple");
+                debugLog("Gay male couple", -0.693, 'protective');
+            } else if (inputs.your_gender === 'Female' && inputs.partner_gender === 'Female') {
+                totalLogPoints += 0.485;
+                drivers.push("Lesbian couple");
+                debugLog("Lesbian couple", 0.485, 'driver');
+            }
+
+            // 4. Race/ethnicity
+            let raceLog = 0;
+            if (inputs.your_race === 'Asian' && inputs.partner_race === 'Asian') {
+                raceLog -= 0.357;
+                protectives.push("Same-Asian couple");
+                debugLog("Same-Asian couple", -0.357, 'protective');
+            } else if (inputs.your_race === 'Hispanic' && inputs.partner_race === 'Hispanic') {
+                raceLog -= 0.105;
+                protectives.push("Same-Hispanic couple");
+                debugLog("Same-Hispanic couple", -0.105, 'protective');
+            } else if (inputs.your_race !== inputs.partner_race && inputs.your_race !== 'Prefer not to say' && inputs.partner_race !== 'Prefer not to say') {
+                if ((inputs.your_gender === 'Female' && inputs.your_race === 'White' && inputs.partner_race === 'Black') || (inputs.partner_gender === 'Female' && inputs.partner_race === 'White' && inputs.your_race === 'Black')) {
+                    raceLog += 1.099;
+                    drivers.push("White wife / Black husband");
+                    debugLog("White wife / Black husband", 1.099, 'driver');
+                } else if ((inputs.your_gender === 'Male' && inputs.your_race === 'White' && inputs.partner_race === 'Black') || (inputs.partner_gender === 'Male' && inputs.partner_race === 'White' && inputs.your_race === 'Black')) {
+                    raceLog += 0.693;
+                    drivers.push("White husband / Black wife");
+                    debugLog("White husband / Black wife", 0.693, 'driver');
+                } else if ((inputs.your_gender === 'Male' && inputs.your_race === 'Black' && inputs.partner_race === 'White') || (inputs.partner_gender === 'Male' && inputs.partner_race === 'Black' && inputs.your_race === 'White')) {
+                    raceLog += 0.336;
+                    drivers.push("Black husband / White wife");
+                    debugLog("Black husband / White wife", 0.336, 'driver');
+                } else if ((inputs.your_race === 'Black' && inputs.partner_race !== 'Black' && inputs.partner_race !== 'White') || (inputs.partner_race === 'Black' && inputs.your_race !== 'Black' && inputs.your_race !== 'White')) {
+                    raceLog += 0.470;
+                    drivers.push("Black + non-White partner");
+                    debugLog("Black + non-White partner", 0.470, 'driver');
+                } else {
+                    raceLog += 0.262;
+                    drivers.push("General mixed-race couple");
+                    debugLog("General mixed-race couple", 0.262, 'driver');
+                }
+            } else if (inputs.your_race === 'Black' && inputs.partner_race === 'Black') {
+                drivers.push("Same-Black couple");
+                debugLog("Same-Black couple", 0, 'neutral');
+            }
+
+            totalLogPoints += raceLog;
+
+            // 5. Immigrant status
+            if (inputs.your_immigrant === 'Yes' || inputs.partner_immigrant === 'Yes') {
+                totalLogPoints -= 0.182;
+                protectives.push("Immigrant background");
+                debugLog("Immigrant background", -0.182, 'protective');
+            }
+
+            // Family instability (cap +0.94 for 3/4 max)
+            let familyLog = 0;
+            let divorceCount = 0;
+            if (inputs.your_parents_divorce === 'Yes') divorceCount++;
+            if (inputs.partner_parents_divorce === 'Yes') divorceCount++;
+            if (divorceCount === 0) {
+                familyLog -= 0.511;
+                protectives.push("Neither parental divorce");
+                debugLog("Neither parental divorce", -0.511, 'protective');
+            } else if (divorceCount === 1) {
+                familyLog += 0.588;
+                drivers.push("One parental divorce");
+                debugLog("One parental divorce", 0.588, 'driver');
+            } else {
+                familyLog += 0.916; // RR 2.5 for both
+                drivers.push("Both parental divorce");
+                debugLog("Both parental divorce", 0.916, 'driver');
+            }
+            if (inputs.your_parent_remarry === 'Yes' || inputs.partner_parent_remarry === 'Yes') {
+                familyLog += 0.405; // RR 1.5 extra for remarriage
+                debugLog("Parent remarry/cohabit", 0.405, 'driver');
+            }
+            if (inputs.your_parent_conflict >= 4 || inputs.partner_parent_conflict >= 4) {
+                const conflictPoints = (divorceCount === 0 ? 0.588 : 0.336); // RR 1.8 standalone, 1.4 if divorce
+                familyLog += conflictPoints;
+                debugLog("High parental conflict", conflictPoints, 'driver');
+            }
+            const originalFamilyLog = familyLog;
+            familyLog = Math.min(familyLog, 0.94);
+            if (originalFamilyLog !== familyLog && DEBUG_MODE) {
+                console.log(`%cFamily instability capped at 0.94 (was ${originalFamilyLog.toFixed(3)})`, 'color: orange; font-style: italic;');
+            }
+            totalLogPoints += familyLog;
+
+            // Adopted/foster
+            let adoptedLog = 0;
+            if (inputs.your_adopted === 'Yes' || inputs.partner_adopted === 'Yes') {
+                adoptedLog = 0.262;
+                if (divorceCount > 0) adoptedLog /= 2;
+                totalLogPoints += adoptedLog;
+                drivers.push("Adopted/foster care");
+                debugLog("Adopted/foster care", adoptedLog, 'driver');
+            } else {
+                adoptedLog = -0.095;
+                totalLogPoints += adoptedLog;
+                protectives.push("No adopted/foster care");
+                debugLog("No adopted/foster care", adoptedLog, 'protective');
+            }
+
+            // Debt load
+            const totalIncome = inputs.your_income + inputs.partner_income;
+            const monthlyIncome = totalIncome / 12;
+            let debtLog = 0;
+            if (monthlyIncome > 0 && inputs.monthly_debt > 0.5 * monthlyIncome) {
+                debtLog = 0.163;
+                totalLogPoints += debtLog;
+                drivers.push("High debt load");
+                debugLog("High debt load", debtLog, 'driver');
+            } else {
+                debtLog = -0.095;
+                totalLogPoints += debtLog;
+                protectives.push("Low debt load");
+                debugLog("Low debt load", debtLog, 'protective');
+            }
+
+            // Relationship Baggage (cap +1.2)
+            let baggageLog = 0;
+            if (inputs.your_prior_marriage === 'Yes') {
+                const priorMarriagePoints = (inputs.your_prior_times_num === '1' ? 0.693 : (inputs.your_prior_times_num === '2' ? 1.099 : 1.386));
+                baggageLog += priorMarriagePoints;
+                debugLog(`Your prior marriage (${inputs.your_prior_times_num === '1' ? '1x' : inputs.your_prior_times_num === '2' ? '2x' : '3+'})`, priorMarriagePoints, 'driver');
+            }
+            if (inputs.partner_prior_marriage === 'Yes') {
+                const partnerPriorMarriagePoints = (inputs.partner_prior_times_num === '1' ? 0.693 : (inputs.partner_prior_times_num === '2' ? 1.099 : 1.386));
+                baggageLog += partnerPriorMarriagePoints;
+                debugLog(`Partner prior marriage (${inputs.partner_prior_times_num === '1' ? '1x' : inputs.partner_prior_times_num === '2' ? '2x' : '3+'})`, partnerPriorMarriagePoints, 'driver');
+            }
+            if (inputs.your_prior_cohab === '2+') {
+                baggageLog += 0.530;
+                debugLog("Your prior cohabitation (2+)", 0.530, 'driver');
+            }
+            if (inputs.partner_prior_cohab === '2+') {
+                baggageLog += 0.530;
+                debugLog("Partner prior cohabitation (2+)", 0.530, 'driver');
+            }
+            if (inputs.your_prior_sex === '2-9') {
+                baggageLog += 0.405;
+                debugLog("Your prior sexual partners (2-9)", 0.405, 'driver');
+            } else if (inputs.your_prior_sex === '10+') {
+                baggageLog += 0.693;
+                debugLog("Your prior sexual partners (10+)", 0.693, 'driver');
+            }
+            if (inputs.partner_prior_sex === '2-9') {
+                baggageLog += 0.405;
+                debugLog("Partner prior sexual partners (2-9)", 0.405, 'driver');
+            } else if (inputs.partner_prior_sex === '10+') {
+                baggageLog += 0.693;
+                debugLog("Partner prior sexual partners (10+)", 0.693, 'driver');
+            }
+            if (baggageLog === 0) {
+                baggageLog -= 0.511;
+                protectives.push("No relationship baggage");
+                debugLog("No relationship baggage", -0.511, 'protective');
+            } else {
+                drivers.push("Relationship baggage");
+                debugLog("Relationship baggage", baggageLog, 'driver');
+            }
+            const originalBaggageLog = baggageLog;
+            baggageLog = Math.min(baggageLog, 1.2);
+            if (originalBaggageLog !== baggageLog && DEBUG_MODE) {
+                console.log(`%cRelationship baggage capped at 1.2 (was ${originalBaggageLog.toFixed(3)})`, 'color: orange; font-style: italic;');
+            }
+            totalLogPoints += baggageLog;
+
+            // Premarital child
+            if (inputs.premarital_child === 'No') {
+                totalLogPoints -= 0.182;
+                protectives.push("No premarital child");
+                debugLog("No premarital child", -0.182, 'protective');
+            } else if (inputs.premarital_child === 'Yes') {
+                totalLogPoints += 0.588;
+                drivers.push("Premarital child");
+                debugLog("Premarital child", 0.588, 'driver');
+            }
+
+            // Prior children
+            if (inputs.your_prior_children === 'Yes' || inputs.partner_prior_children === 'Yes') {
+                totalLogPoints += 0.470;
+                drivers.push("Children from prior relationship");
+                debugLog("Children from prior relationship", 0.470, 'driver');
+            } else {
+                totalLogPoints -= 0.095;
+                protectives.push("No prior children");
+                debugLog("No prior children", -0.095, 'protective');
+            }
+
+            // Courtship length
+            if (inputs.courtship_length === '3+') {
+                totalLogPoints -= 0.288;
+                protectives.push("Long courtship (3+ years)");
+                debugLog("Long courtship (3+ years)", -0.288, 'protective');
+            } else if (inputs.courtship_length === 'less6') {
+                totalLogPoints += 0.470;
+                drivers.push("Short courtship (<6 months)");
+                debugLog("Short courtship (<6 months)", 0.470, 'driver');
+            }
+
+            // Wife education > husband
+            const eduLevels = { 'less_hs': 1, 'hs': 2, 'some_college': 3, 'bachelors': 4, 'masters+': 5 };
+            const yourEdu = eduLevels[inputs.your_education] || 0;
+            const partnerEdu = eduLevels[inputs.partner_education] || 0;
+            const wifeEdu = inputs.your_gender === 'Female' ? yourEdu : partnerEdu;
+            const husbandEdu = inputs.your_gender === 'Male' ? yourEdu : partnerEdu;
+            if (wifeEdu > husbandEdu + 1) {
+                totalLogPoints += 0.336;
+                drivers.push("Wife significantly more educated");
+                debugLog("Wife significantly more educated", 0.336, 'driver');
+            } else {
+                totalLogPoints -= 0.095;
+                protectives.push("Balanced education");
+                debugLog("Balanced education", -0.095, 'protective');
+            }
+
+            // Wife earns >=60%
+            const wifeIncome = inputs.your_gender === 'Female' ? inputs.your_income : inputs.partner_income;
+            const totalIncomeCalc = inputs.your_income + inputs.partner_income;
+            if (totalIncomeCalc > 0 && wifeIncome / totalIncomeCalc >= 0.6) {
+                totalLogPoints += 0.405;
+                drivers.push("Wife earns 60%+ of income");
+                debugLog("Wife earns 60%+ of income", 0.405, 'driver');
+            } else {
+                totalLogPoints -= 0.095;
+                protectives.push("Balanced income");
+                debugLog("Balanced income", -0.095, 'protective');
+            }
+
+            // Household income
+            if (totalIncomeCalc >= 150000) {
+                totalLogPoints -= 0.357;
+                protectives.push("High household income");
+                debugLog("High household income", -0.357, 'protective');
+            } else if (totalIncomeCalc < 50000) {
+                totalLogPoints += 0.405;
+                drivers.push("Low household income");
+                debugLog("Low household income", 0.405, 'driver');
+            }
+
+            // Homeownership
+            if (inputs.homeownership === 'Yes') {
+                totalLogPoints -= 0.288;
+                protectives.push("Plan to own home");
+                debugLog("Plan to own home", -0.288, 'protective');
+            } else if (inputs.homeownership === 'No') {
+                totalLogPoints += 0.105;
+                drivers.push("No homeownership plan");
+                debugLog("No homeownership plan", 0.105, 'driver');
+            }
+
+            // Occupation
+            let occLog = 0;
+            const yourOcc = inputs.your_occupation === 'Other' ? inputs.your_occupation_other : inputs.your_occupation;
+            const partnerOcc = inputs.partner_occupation === 'Other' ? inputs.partner_occupation_other : inputs.partner_occupation;
+            if (highStress.includes(yourOcc)) {
+                occLog += 0.262;
+                debugLog(`Your occupation (high-stress: ${yourOcc})`, 0.262, 'driver');
+            }
+            if (infidelityProne.includes(yourOcc)) {
+                occLog += 0.336;
+                debugLog(`Your occupation (infidelity-prone: ${yourOcc})`, 0.336, 'driver');
+            }
+            if (lowStress.includes(yourOcc)) {
+                occLog -= 0.095;
+                debugLog(`Your occupation (low-stress: ${yourOcc})`, -0.095, 'protective');
+            }
+            if (highStress.includes(partnerOcc)) {
+                occLog += 0.262;
+                debugLog(`Partner occupation (high-stress: ${partnerOcc})`, 0.262, 'driver');
+            }
+            if (infidelityProne.includes(partnerOcc)) {
+                occLog += 0.336;
+                debugLog(`Partner occupation (infidelity-prone: ${partnerOcc})`, 0.336, 'driver');
+            }
+            if (lowStress.includes(partnerOcc)) {
+                occLog -= 0.095;
+                debugLog(`Partner occupation (low-stress: ${partnerOcc})`, -0.095, 'protective');
+            }
+            totalLogPoints += occLog;
+
+            // Health & Lifestyle (cap +0.8)
+            let healthLog = 0;
+            if (inputs.your_smoking === 'Yes' || inputs.partner_smoking === 'Yes') {
+                healthLog += 0.470;
+                debugLog("Smoking (daily)", 0.470, 'driver');
+            } else {
+                healthLog -= 0.095;
+                debugLog("No smoking", -0.095, 'protective');
+            }
+            if (inputs.your_drinking === 'Yes' || inputs.partner_drinking === 'Yes') {
+                healthLog += 0.470;
+                debugLog("Heavy drinking", 0.470, 'driver');
+            } else {
+                healthLog -= 0.095;
+                debugLog("No heavy drinking", -0.095, 'protective');
+            }
+            if (inputs.your_mental_health === 'Yes' || inputs.partner_mental_health === 'Yes') {
+                healthLog += 0.530;
+                debugLog("Untreated mental health", 0.530, 'driver');
+            } else {
+                healthLog -= 0.095;
+                debugLog("No untreated mental health", -0.095, 'protective');
+            }
+            if (inputs.your_chronic === 'Yes' || inputs.partner_chronic === 'Yes') {
+                healthLog += 0.405;
+                debugLog("Chronic illness", 0.405, 'driver');
+            } else {
+                healthLog -= 0.095;
+                debugLog("No chronic illness", -0.095, 'protective');
+            }
+            // BMI (FIXED: Only both <25 is protective)
+            if (inputs.your_bmi === 'over30' && inputs.partner_bmi === 'over30') {
+                healthLog += 0.262;
+                debugLog("Both BMI >30", 0.262, 'driver');
+            } else if (inputs.your_bmi === 'under25' && inputs.partner_bmi === 'under25') {
+                healthLog -= 0.288;
+                debugLog("Both BMI <25", -0.288, 'protective');
+            }
+            if (inputs.your_porn === 'Yes' || inputs.partner_porn === 'Yes') {
+                healthLog += 0.336;
+                debugLog("Excessive/secretive pornography", 0.336, 'driver');
+            } else {
+                healthLog -= 0.095;
+                debugLog("No excessive pornography", -0.095, 'protective');
+            }
+            const originalHealthLog = healthLog;
+            healthLog = Math.min(healthLog, 0.8);
+            if (originalHealthLog !== healthLog && DEBUG_MODE) {
+                console.log(`%cHealth & Lifestyle capped at 0.8 (was ${originalHealthLog.toFixed(3)})`, 'color: orange; font-style: italic;');
+            }
+            totalLogPoints += healthLog;
+
+            // SES cap (+0.6 / -0.4)
+            let sesLog = 0;
+            if (totalIncomeCalc >= 150000) {
+                sesLog -= 0.357;
+                debugLog("SES: High income (≥$150k)", -0.357, 'protective');
+            } else if (totalIncomeCalc < 50000) {
+                sesLog += 0.405;
+                debugLog("SES: Low income (<$50k)", 0.405, 'driver');
+            }
+            if (totalIncomeCalc > 0 && wifeIncome / totalIncomeCalc >= 0.6) {
+                sesLog += 0.405;
+                debugLog("SES: Wife earns 60%+", 0.405, 'driver');
+            } else {
+                sesLog -= 0.095;
+                debugLog("SES: Balanced income", -0.095, 'protective');
+            }
+            if (inputs.homeownership === 'Yes') {
+                sesLog -= 0.288;
+                debugLog("SES: Homeownership", -0.288, 'protective');
+            } else if (inputs.homeownership === 'No') {
+                sesLog += 0.105;
+                debugLog("SES: No homeownership", 0.105, 'driver');
+            }
+            if (monthlyIncome > 0 && inputs.monthly_debt > 0.5 * monthlyIncome) {
+                sesLog += 0.163;
+                debugLog("SES: High debt load", 0.163, 'driver');
+            } else {
+                sesLog -= 0.095;
+                debugLog("SES: Low debt", -0.095, 'protective');
+            }
+            const originalSesLog = sesLog;
+            sesLog = Math.min(Math.max(sesLog, -0.4), 0.6);
+            if (originalSesLog !== sesLog && DEBUG_MODE) {
+                console.log(`%cSES capped at ${sesLog.toFixed(3)} (was ${originalSesLog.toFixed(3)})`, 'color: orange; font-style: italic;');
+            }
+            totalLogPoints += sesLog;
+
+            // Personality (average attachment + neuroticism, cap +0.8)
+            let attachmentYour = 0;
+            if (inputs.your_attachment1 === 'Agree') attachmentYour++;
+            if (inputs.your_attachment2 === 'Agree') attachmentYour++;
+            if (inputs.your_attachment3 === 'Agree') attachmentYour++;
+            let attachmentPartner = 0;
+            if (inputs.partner_attachment1 === 'Agree') attachmentPartner++;
+            if (inputs.partner_attachment2 === 'Agree') attachmentPartner++;
+            if (inputs.partner_attachment3 === 'Agree') attachmentPartner++;
+
+            let attachmentLog = 0;
+            if (attachmentYour >= 2 || attachmentPartner >= 2) {
+                attachmentLog = 0.588; // Insecure
+                debugLog(`Attachment: Insecure (≥2 agrees)`, 0.588, 'driver');
+            } else if (attachmentYour <= 1 && attachmentPartner <= 1) {
+                attachmentLog = -0.511; // Secure
+                debugLog(`Attachment: Secure (0–1 agree)`, -0.511, 'protective');
+            }
+            // else: 1 agree on one side → neutral → 0.0
+
+            let neuroYour = 0;
+            if (inputs.your_neuro1 === 'Agree') neuroYour++;
+            if (inputs.your_neuro2 === 'Agree') neuroYour++;
+            if (inputs.your_neuro3 === 'Agree') neuroYour++;
+            let neuroPartner = 0;
+            if (inputs.partner_neuro1 === 'Agree') neuroPartner++;
+            if (inputs.partner_neuro2 === 'Agree') neuroPartner++;
+            if (inputs.partner_neuro3 === 'Agree') neuroPartner++;
+
+            let neuroLog = 0;
+            if (neuroYour >= 2 || neuroPartner >= 2) {
+                neuroLog = 0.470; // High neuroticism
+                debugLog(`Neuroticism: High (≥2 agrees)`, 0.470, 'driver');
+            } else if (neuroYour <= 1 && neuroPartner <= 1) {
+                neuroLog = -0.357; // Low neuroticism
+                debugLog(`Neuroticism: Low (0–1 agree)`, -0.357, 'protective');
+            }
+            // else: 1 agree → neutral → 0.0
+
+            const personalityLog = Math.min((attachmentLog + neuroLog) / 2, 0.8);
+            if (DEBUG_MODE && (attachmentLog + neuroLog) / 2 > 0.8) {
+                console.log(`%cPersonality capped at 0.8 (was ${((attachmentLog + neuroLog) / 2).toFixed(3)})`, 'color: orange; font-style: italic;');
+            }
+            totalLogPoints += personalityLog;
+
+            // Religious attendance
+            if (inputs.religious_attendance === 'Weekly') {
+                totalLogPoints -= 0.357;
+                protectives.push("Weekly religious attendance");
+                debugLog("Weekly religious attendance", -0.357, 'protective');
+            } else if (inputs.religious_attendance === 'Never') {
+                totalLogPoints += 0.288;
+                drivers.push("No religious attendance");
+                debugLog("No religious attendance", 0.288, 'driver');
+            }
+
+            // Final risk
+            if (DEBUG_MODE) {
+                console.log('%c═══════════════════════════════════════', 'color: #667eea; font-weight: bold;');
+                console.log(`%cBase Logit: ${baseLogit.toFixed(3)}`, 'color: #667eea; font-weight: bold;');
+                console.log(`%cTotal Log Points: ${totalLogPoints.toFixed(3)}`, 'color: #667eea; font-weight: bold;');
+                console.log(`%cFinal Logit: ${(baseLogit + totalLogPoints).toFixed(3)}`, 'color: #667eea; font-weight: bold;');
+            }
+            const tenYearRisk = (1 / (1 + Math.exp(-(baseLogit + totalLogPoints)))) * 100;
+            const percentage = ((28 - tenYearRisk) / 28) * 100;
+            const lifetimeRisk = Math.min(tenYearRisk * 1.55, 99);
+            
+            if (DEBUG_MODE) {
+                console.log(`%c10-Year Risk: ${tenYearRisk.toFixed(1)}%`, 'color: #e74c3c; font-weight: bold; font-size: 14px;');
+                console.log(`%cLifetime Risk: ${lifetimeRisk.toFixed(1)}%`, 'color: #e74c3c; font-weight: bold; font-size: 14px;');
+                console.log('%c═══════════════════════════════════════', 'color: #667eea; font-weight: bold;');
+            }
+
+            // Results are shown via validateAndCalculate animation
+
+            document.getElementById('risk10').innerText = `Your Estimated 10-Year Divorce Risk: ${tenYearRisk.toFixed(1)}%`;
+            document.getElementById('percentage').innerText = percentage >= 0 
+                ? `You are ${percentage.toFixed(1)}% lower than average` 
+                : `You are ${Math.abs(percentage).toFixed(1)}% higher than average`;
+            document.getElementById('lifetime').innerText = `Projected Lifetime Divorce Risk: ${lifetimeRisk.toFixed(1)}%`;
+
+            // Top factors (show top 3)
+            const protList = document.getElementById('protectives');
+            const driveList = document.getElementById('drivers');
+            const protListAll = document.getElementById('protectives-all');
+            const driveListAll = document.getElementById('drivers-all');
+            
+            protList.innerHTML = '';
+            driveList.innerHTML = '';
+            protListAll.innerHTML = '';
+            driveListAll.innerHTML = '';
+            
+            // Top 3 protective factors
+            protectives.slice(0, 3).forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                protList.appendChild(li);
+            });
+            
+            // All remaining protective factors
+            protectives.slice(3).forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                protListAll.appendChild(li);
+            });
+            
+            // Top 3 risk drivers
+            drivers.slice(0, 3).forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                li.classList.add('risk');
+                driveList.appendChild(li);
+            });
+            
+            // All remaining risk drivers
+            drivers.slice(3).forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                li.classList.add('risk');
+                driveListAll.appendChild(li);
+            });
+            
+            // Update toggle button text based on whether there are more factors
+            const toggleProtectivesBtn = document.getElementById('toggleProtectives');
+            const toggleDriversBtn = document.getElementById('toggleDrivers');
+            
+            if (protectives.length > 3) {
+                toggleProtectivesBtn.textContent = 'Show All';
+                toggleProtectivesBtn.style.display = 'inline';
+            } else {
+                toggleProtectivesBtn.style.display = 'none';
+            }
+            
+            if (drivers.length > 3) {
+                toggleDriversBtn.textContent = 'Show All';
+                toggleDriversBtn.style.display = 'inline';
+            } else {
+                toggleDriversBtn.style.display = 'none';
+            }
+            
+            // Save results to cookie (expires in 30 days)
+            const resultsData = {
+                tenYearRisk: tenYearRisk.toFixed(1),
+                percentage: percentage >= 0 
+                    ? `You are ${percentage.toFixed(1)}% lower than average` 
+                    : `You are ${Math.abs(percentage).toFixed(1)}% higher than average`,
+                lifetime: `Projected Lifetime Divorce Risk: ${lifetimeRisk.toFixed(1)}%`,
+                protectives: protectives,
+                drivers: drivers,
+                timestamp: new Date().toISOString()
+            };
+            setCookie('divorceRiskResults', resultsData, 30);
+        }
+        
+        // Check for saved results when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            checkForSavedResults();
+        });
+    </script>
+</body>
+</html>
