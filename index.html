@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Divorce Risk Calculator</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3487963048426020"
+     crossorigin="anonymous"></script>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -1400,6 +1402,9 @@
             <p id="risk10"></p>
             <p id="percentage"></p>
             <p id="lifetime"></p>
+            <p style="font-size: 0.9em; color: #7f8c8d; margin-top: 20px; margin-bottom: 20px; line-height: 1.6;">
+                No one plans to get divorced, but a prenup can help in case it happens. And studies have shown it can have a slight protective effect. You can get one <a href="https://helloprenup.com/?via=oddsonlife" target="_blank" rel="noopener noreferrer" style="color: #667eea; text-decoration: none; font-weight: 600;">here</a>.
+            </p>
             <div class="top-factors">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3>Top Protective Factors</h3>
@@ -2097,11 +2102,13 @@
             }
             if (inputs.your_parent_remarry === 'Yes' || inputs.partner_parent_remarry === 'Yes') {
                 familyLog += 0.405; // RR 1.5 extra for remarriage
+                drivers.push("Parent remarry/cohabit");
                 debugLog("Parent remarry/cohabit", 0.405, 'driver');
             }
             if (inputs.your_parent_conflict >= 4 || inputs.partner_parent_conflict >= 4) {
                 const conflictPoints = (divorceCount === 0 ? 0.588 : 0.336); // RR 1.8 standalone, 1.4 if divorce
                 familyLog += conflictPoints;
+                drivers.push("High parental conflict");
                 debugLog("High parental conflict", conflictPoints, 'driver');
             }
             const originalFamilyLog = familyLog;
@@ -2147,33 +2154,41 @@
             if (inputs.your_prior_marriage === 'Yes') {
                 const priorMarriagePoints = (inputs.your_prior_times_num === '1' ? 0.693 : (inputs.your_prior_times_num === '2' ? 1.099 : 1.386));
                 baggageLog += priorMarriagePoints;
+                drivers.push(`Your prior marriage (${inputs.your_prior_times_num === '1' ? '1x' : inputs.your_prior_times_num === '2' ? '2x' : '3+'})`);
                 debugLog(`Your prior marriage (${inputs.your_prior_times_num === '1' ? '1x' : inputs.your_prior_times_num === '2' ? '2x' : '3+'})`, priorMarriagePoints, 'driver');
             }
             if (inputs.partner_prior_marriage === 'Yes') {
                 const partnerPriorMarriagePoints = (inputs.partner_prior_times_num === '1' ? 0.693 : (inputs.partner_prior_times_num === '2' ? 1.099 : 1.386));
                 baggageLog += partnerPriorMarriagePoints;
+                drivers.push(`Partner prior marriage (${inputs.partner_prior_times_num === '1' ? '1x' : inputs.partner_prior_times_num === '2' ? '2x' : '3+'})`);
                 debugLog(`Partner prior marriage (${inputs.partner_prior_times_num === '1' ? '1x' : inputs.partner_prior_times_num === '2' ? '2x' : '3+'})`, partnerPriorMarriagePoints, 'driver');
             }
             if (inputs.your_prior_cohab === '2+') {
                 baggageLog += 0.530;
+                drivers.push("Your prior cohabitation (2+)");
                 debugLog("Your prior cohabitation (2+)", 0.530, 'driver');
             }
             if (inputs.partner_prior_cohab === '2+') {
                 baggageLog += 0.530;
+                drivers.push("Partner prior cohabitation (2+)");
                 debugLog("Partner prior cohabitation (2+)", 0.530, 'driver');
             }
             if (inputs.your_prior_sex === '2-9') {
                 baggageLog += 0.405;
+                drivers.push("Your prior sexual partners (2-9)");
                 debugLog("Your prior sexual partners (2-9)", 0.405, 'driver');
             } else if (inputs.your_prior_sex === '10+') {
                 baggageLog += 0.693;
+                drivers.push("Your prior sexual partners (10+)");
                 debugLog("Your prior sexual partners (10+)", 0.693, 'driver');
             }
             if (inputs.partner_prior_sex === '2-9') {
                 baggageLog += 0.405;
+                drivers.push("Partner prior sexual partners (2-9)");
                 debugLog("Partner prior sexual partners (2-9)", 0.405, 'driver');
             } else if (inputs.partner_prior_sex === '10+') {
                 baggageLog += 0.693;
+                drivers.push("Partner prior sexual partners (10+)");
                 debugLog("Partner prior sexual partners (10+)", 0.693, 'driver');
             }
             if (baggageLog === 0) {
@@ -2281,26 +2296,32 @@
             const partnerOcc = inputs.partner_occupation === 'Other' ? inputs.partner_occupation_other : inputs.partner_occupation;
             if (highStress.includes(yourOcc)) {
                 occLog += 0.262;
+                drivers.push(`Your occupation (high-stress: ${yourOcc})`);
                 debugLog(`Your occupation (high-stress: ${yourOcc})`, 0.262, 'driver');
             }
             if (infidelityProne.includes(yourOcc)) {
                 occLog += 0.336;
+                drivers.push(`Your occupation (infidelity-prone: ${yourOcc})`);
                 debugLog(`Your occupation (infidelity-prone: ${yourOcc})`, 0.336, 'driver');
             }
             if (lowStress.includes(yourOcc)) {
                 occLog -= 0.095;
+                protectives.push(`Your occupation (low-stress: ${yourOcc})`);
                 debugLog(`Your occupation (low-stress: ${yourOcc})`, -0.095, 'protective');
             }
             if (highStress.includes(partnerOcc)) {
                 occLog += 0.262;
+                drivers.push(`Partner occupation (high-stress: ${partnerOcc})`);
                 debugLog(`Partner occupation (high-stress: ${partnerOcc})`, 0.262, 'driver');
             }
             if (infidelityProne.includes(partnerOcc)) {
                 occLog += 0.336;
+                drivers.push(`Partner occupation (infidelity-prone: ${partnerOcc})`);
                 debugLog(`Partner occupation (infidelity-prone: ${partnerOcc})`, 0.336, 'driver');
             }
             if (lowStress.includes(partnerOcc)) {
                 occLog -= 0.095;
+                protectives.push(`Partner occupation (low-stress: ${partnerOcc})`);
                 debugLog(`Partner occupation (low-stress: ${partnerOcc})`, -0.095, 'protective');
             }
             totalLogPoints += occLog;
@@ -2309,45 +2330,57 @@
             let healthLog = 0;
             if (inputs.your_smoking === 'Yes' || inputs.partner_smoking === 'Yes') {
                 healthLog += 0.470;
+                drivers.push("Smoking (daily)");
                 debugLog("Smoking (daily)", 0.470, 'driver');
             } else {
                 healthLog -= 0.095;
+                protectives.push("No smoking");
                 debugLog("No smoking", -0.095, 'protective');
             }
             if (inputs.your_drinking === 'Yes' || inputs.partner_drinking === 'Yes') {
                 healthLog += 0.470;
+                drivers.push("Heavy drinking");
                 debugLog("Heavy drinking", 0.470, 'driver');
             } else {
                 healthLog -= 0.095;
+                protectives.push("No heavy drinking");
                 debugLog("No heavy drinking", -0.095, 'protective');
             }
             if (inputs.your_mental_health === 'Yes' || inputs.partner_mental_health === 'Yes') {
                 healthLog += 0.530;
+                drivers.push("Untreated mental health");
                 debugLog("Untreated mental health", 0.530, 'driver');
             } else {
                 healthLog -= 0.095;
+                protectives.push("No untreated mental health");
                 debugLog("No untreated mental health", -0.095, 'protective');
             }
             if (inputs.your_chronic === 'Yes' || inputs.partner_chronic === 'Yes') {
                 healthLog += 0.405;
+                drivers.push("Chronic illness");
                 debugLog("Chronic illness", 0.405, 'driver');
             } else {
                 healthLog -= 0.095;
+                protectives.push("No chronic illness");
                 debugLog("No chronic illness", -0.095, 'protective');
             }
             // BMI (FIXED: Only both <25 is protective)
             if (inputs.your_bmi === 'over30' && inputs.partner_bmi === 'over30') {
                 healthLog += 0.262;
+                drivers.push("Both BMI >30");
                 debugLog("Both BMI >30", 0.262, 'driver');
             } else if (inputs.your_bmi === 'under25' && inputs.partner_bmi === 'under25') {
                 healthLog -= 0.288;
+                protectives.push("Both BMI <25");
                 debugLog("Both BMI <25", -0.288, 'protective');
             }
             if (inputs.your_porn === 'Yes' || inputs.partner_porn === 'Yes') {
                 healthLog += 0.336;
+                drivers.push("Excessive/secretive pornography");
                 debugLog("Excessive/secretive pornography", 0.336, 'driver');
             } else {
                 healthLog -= 0.095;
+                protectives.push("No excessive pornography");
                 debugLog("No excessive pornography", -0.095, 'protective');
             }
             const originalHealthLog = healthLog;
@@ -2361,30 +2394,38 @@
             let sesLog = 0;
             if (totalIncomeCalc >= 150000) {
                 sesLog -= 0.357;
+                protectives.push("SES: High income (≥$150k)");
                 debugLog("SES: High income (≥$150k)", -0.357, 'protective');
             } else if (totalIncomeCalc < 50000) {
                 sesLog += 0.405;
+                drivers.push("SES: Low income (<$50k)");
                 debugLog("SES: Low income (<$50k)", 0.405, 'driver');
             }
             if (totalIncomeCalc > 0 && wifeIncome / totalIncomeCalc >= 0.6) {
                 sesLog += 0.405;
+                drivers.push("SES: Wife earns 60%+");
                 debugLog("SES: Wife earns 60%+", 0.405, 'driver');
             } else {
                 sesLog -= 0.095;
+                protectives.push("SES: Balanced income");
                 debugLog("SES: Balanced income", -0.095, 'protective');
             }
             if (inputs.homeownership === 'Yes') {
                 sesLog -= 0.288;
+                protectives.push("SES: Homeownership");
                 debugLog("SES: Homeownership", -0.288, 'protective');
             } else if (inputs.homeownership === 'No') {
                 sesLog += 0.105;
+                drivers.push("SES: No homeownership");
                 debugLog("SES: No homeownership", 0.105, 'driver');
             }
             if (monthlyIncome > 0 && inputs.monthly_debt > 0.5 * monthlyIncome) {
                 sesLog += 0.163;
+                drivers.push("SES: High debt load");
                 debugLog("SES: High debt load", 0.163, 'driver');
             } else {
                 sesLog -= 0.095;
+                protectives.push("SES: Low debt");
                 debugLog("SES: Low debt", -0.095, 'protective');
             }
             const originalSesLog = sesLog;
@@ -2407,9 +2448,11 @@
             let attachmentLog = 0;
             if (attachmentYour >= 2 || attachmentPartner >= 2) {
                 attachmentLog = 0.588; // Insecure
+                drivers.push("Attachment: Insecure (≥2 agrees)");
                 debugLog(`Attachment: Insecure (≥2 agrees)`, 0.588, 'driver');
             } else if (attachmentYour <= 1 && attachmentPartner <= 1) {
                 attachmentLog = -0.511; // Secure
+                protectives.push("Attachment: Secure (0–1 agree)");
                 debugLog(`Attachment: Secure (0–1 agree)`, -0.511, 'protective');
             }
             // else: 1 agree on one side → neutral → 0.0
@@ -2426,9 +2469,11 @@
             let neuroLog = 0;
             if (neuroYour >= 2 || neuroPartner >= 2) {
                 neuroLog = 0.470; // High neuroticism
+                drivers.push("Neuroticism: High (≥2 agrees)");
                 debugLog(`Neuroticism: High (≥2 agrees)`, 0.470, 'driver');
             } else if (neuroYour <= 1 && neuroPartner <= 1) {
                 neuroLog = -0.357; // Low neuroticism
+                protectives.push("Neuroticism: Low (0–1 agree)");
                 debugLog(`Neuroticism: Low (0–1 agree)`, -0.357, 'protective');
             }
             // else: 1 agree → neutral → 0.0
