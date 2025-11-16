@@ -433,11 +433,41 @@
             font-size: 0.9em;
         }
         
+        .load-results-modal {
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
+        }
+        
+        .load-results-buttons {
+            flex-wrap: wrap;
+        }
+        
         @media (max-width: 768px) {
+            .load-results-buttons {
+                flex-direction: column;
+            }
+            
+            .load-results-buttons button {
+                width: 100%;
+            }
             .modal-content {
                 width: 95%;
                 margin: 5% auto;
                 max-height: 85vh;
+            }
+            
+            .load-results-modal {
+                width: 90% !important;
+                max-width: 90% !important;
+                padding: 40px 25px !important;
+                position: absolute !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                margin: 0 !important;
             }
             
             .modal-content .container {
@@ -1581,11 +1611,14 @@
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
             modal.innerHTML = `
-                <div class="modal-content" style="max-width: 500px;">
-                    <h2 style="margin-top: 0;">Previous Results Found</h2>
-                    <p>We found your previous survey results from ${new Date(savedResults.timestamp).toLocaleString()}.</p>
-                    <p><strong>Your 10-Year Risk:</strong> ${savedResults.tenYearRisk}%</p>
-                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <div class="modal-content load-results-modal" style="max-width: 550px; padding: 50px 40px; margin: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-height: 90vh; overflow-y: auto;">
+                    <h2 style="margin-top: 0; margin-bottom: 20px; color: #2c3e50; font-size: 1.8em; text-align: center;">Previous Results Found</h2>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid #667eea;">
+                        <p style="margin: 0 0 10px 0; color: #7f8c8d; font-size: 0.95em;">We found your previous survey results from:</p>
+                        <p style="margin: 0 0 15px 0; font-weight: 600; color: #2c3e50;">${new Date(savedResults.timestamp).toLocaleString()}</p>
+                        <p style="margin: 0; font-size: 1.1em;"><strong style="color: #2c3e50;">Your 10-Year Risk:</strong> <span style="color: #e74c3c; font-size: 1.3em; font-weight: bold;">${savedResults.tenYearRisk}%</span></p>
+                    </div>
+                    <div class="load-results-buttons" style="display: flex; gap: 15px; margin-top: 30px;">
                         <button onclick="loadPreviousResults()" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">Load Previous Results</button>
                         <button onclick="startFresh()" style="flex: 1; padding: 15px; background: #e0e0e0; color: #333; border: none; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.background='#d0d0d0'" onmouseout="this.style.transform='translateY(0)'; this.style.background='#e0e0e0'">Start Fresh</button>
                     </div>
