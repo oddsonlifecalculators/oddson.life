@@ -12,7 +12,22 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divorce Risk Calculator</title>
+
+    <!-- SEO & Social Sharing -->
+    <title>Odds on Life | And actually honest divorce risk calculator for a change</title>
+    <meta name="description" content="Know your real odds before you say 'I do'. Scientifically-backed calculator that estimates your 10-year divorce risk using 28 proven factors." />
+    <meta property="og:title" content="Odds on Life – Realistic Marriage Risk Calculator" />
+    <meta property="og:description" content="Free tool that shows your actual 10-year divorce probability based on research — no sugarcoating." />
+    <meta property="og:image" content="https://oddson.life/og-image.jpg" />
+    <meta property="og:url" content="https://oddson.life" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://oddson.life" />
+
+    <!-- Favicon (replace with your own later if you want) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>Chart</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>Chart</text></svg>">
+    
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3487963048426020"
      crossorigin="anonymous"></script>
      
@@ -23,9 +38,92 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
             margin: 0; 
             padding: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f5f5;
             min-height: 100vh;
             line-height: 1.6; 
+        }
+        
+        /* Navigation Styles */
+        .main-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin: -20px -20px 20px -20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #1a365d;
+        }
+        
+        .nav-links a.active {
+            color: #1a365d;
+        }
+        
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #1a365d;
+        }
+        
+        .nav-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a365d;
+            text-decoration: none;
+        }
+        
+        .nav-logo:hover {
+            color: #2c5282;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 20px;
+            }
+            
+            .nav-links a {
+                font-size: 14px;
+            }
         }
         
         .container {
@@ -36,41 +134,41 @@
         section { 
             margin-bottom: 25px; 
             padding: 40px; 
-            border: none; 
-            border-radius: 20px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 4px; 
             background: white; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             position: relative;
             overflow: hidden;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            transition: opacity 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        section:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
         
         section.slide-in {
-            animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: fadeIn 0.4s ease forwards;
         }
         
         section.slide-out {
-            animation: slideOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: fadeOut 0.3s ease forwards;
         }
         
-        @keyframes slideIn {
+        @keyframes fadeIn {
             from {
-                transform: translateX(100%);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
                 opacity: 1;
             }
         }
         
-        @keyframes slideOut {
+        @keyframes fadeOut {
             from {
-                transform: translateX(0);
                 opacity: 1;
             }
             to {
-                transform: translateX(-100%);
                 opacity: 0;
             }
         }
@@ -95,67 +193,66 @@
         }
         
         /* Color coding for sections */
-        #intro h1 { border-bottom: 3px solid #667eea; }
-        #part1 h2 { border-bottom-color: #3498db; }
-        #part2 h2 { border-bottom-color: #e74c3c; }
-        #part3 h2 { border-bottom-color: #f39c12; }
-        #part4 h2 { border-bottom-color: #27ae60; }
-        #part5 h2 { border-bottom-color: #9b59b6; }
-        #part6 h2 { border-bottom-color: #1abc9c; }
-        #results h2 { border-bottom-color: #34495e; }
+        #intro h1 { border-bottom: 2px solid #1a365d; }
+        #part1 h2 { border-bottom-color: #2c5282; }
+        #part2 h2 { border-bottom-color: #2c5282; }
+        #part3 h2 { border-bottom-color: #2c5282; }
+        #part4 h2 { border-bottom-color: #2c5282; }
+        #part5 h2 { border-bottom-color: #2c5282; }
+        #part6 h2 { border-bottom-color: #2c5282; }
+        #results h2 { border-bottom-color: #1a365d; }
         
         button { 
-            padding: 15px 35px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px 30px; 
+            background: #1a365d;
             color: white; 
             border: none; 
-            border-radius: 50px; 
+            border-radius: 4px; 
             cursor: pointer; 
             font-size: 16px; 
             font-weight: 600;
             margin-top: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         button:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            background: #2c5282;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         
         button:active {
-            transform: translateY(0);
+            background: #153450;
         }
         
         .results { 
-            background: linear-gradient(135deg, #e8f8f5 0%, #d5f5e3 100%);
+            background: #f8f9fa;
             padding: 40px; 
-            border-radius: 15px; 
+            border-radius: 4px; 
             font-size: 18px; 
             text-align: center;
-            border: 2px solid #27ae60;
+            border: 1px solid #d0d0d0;
         }
         
         .question-group {
-            background: #f8f9fa;
+            background: #fafafa;
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 4px;
             margin-bottom: 20px;
-            border-left: 4px solid;
-            transition: all 0.3s ease;
+            border-left: 3px solid #2c5282;
+            transition: background-color 0.2s ease;
         }
         
         .question-group:hover {
-            background: #f0f2f5;
-            transform: translateX(5px);
+            background: #f5f5f5;
         }
         
-        #part1 .question-group { border-left-color: #3498db; }
-        #part2 .question-group { border-left-color: #e74c3c; }
-        #part3 .question-group { border-left-color: #f39c12; }
-        #part4 .question-group { border-left-color: #27ae60; }
-        #part5 .question-group { border-left-color: #9b59b6; }
-        #part6 .question-group { border-left-color: #1abc9c; }
+        #part1 .question-group { border-left-color: #2c5282; }
+        #part2 .question-group { border-left-color: #2c5282; }
+        #part3 .question-group { border-left-color: #2c5282; }
+        #part4 .question-group { border-left-color: #2c5282; }
+        #part5 .question-group { border-left-color: #2c5282; }
+        #part6 .question-group { border-left-color: #2c5282; }
         
         .question-pair {
             display: grid;
@@ -200,31 +297,31 @@
         
         input, select { 
             width: 100%; 
-            padding: 14px; 
+            padding: 12px; 
             margin-bottom: 15px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 10px; 
+            border: 1px solid #d0d0d0; 
+            border-radius: 4px; 
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
             background: white;
         }
         
         input:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #2c5282;
+            box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.1);
         }
         
         .error { 
-            color: #e74c3c; 
+            color: #c53030; 
             font-size: 0.9em; 
             margin-top: -10px; 
             margin-bottom: 15px; 
             display: none;
             padding: 10px;
-            background: #fee;
-            border-radius: 8px;
-            border-left: 4px solid #e74c3c;
+            background: #fed7d7;
+            border-radius: 4px;
+            border-left: 3px solid #c53030;
         }
         
         .progress { 
@@ -245,8 +342,8 @@
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
+            background: #2c5282;
+            border-radius: 4px;
             transition: width 0.5s ease;
         }
         
@@ -257,7 +354,7 @@
         
         .top-factors h3 { 
             margin: 20px 0 15px; 
-            color: #27ae60;
+            color: #1a365d;
             font-size: 1.3em;
         }
         
@@ -269,28 +366,28 @@
         .top-factors li { 
             margin: 10px 0; 
             padding: 15px; 
-            background: #d5f5e3; 
-            border-radius: 10px;
-            border-left: 4px solid #27ae60;
-            transition: all 0.3s ease;
+            background: #f0f4f8; 
+            border-radius: 4px;
+            border-left: 3px solid #2c5282;
+            transition: background-color 0.2s ease;
         }
         
         .top-factors li:hover {
-            transform: translateX(5px);
+            background: #e2e8f0;
         }
         
         .top-factors .risk { 
-            color: #c0392b; 
-            background: #fadbd8;
-            border-left-color: #e74c3c;
+            color: #742a2a; 
+            background: #fed7d7;
+            border-left-color: #c53030;
         }
         
         .top-factors a {
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
         }
         
         .top-factors a:hover {
-            color: #764ba2;
+            color: #2c5282;
             text-decoration: underline;
         }
         
@@ -344,16 +441,16 @@
         }
         
         .modal-content {
-            background-color: #fefefe;
+            background-color: #ffffff;
             margin: 2% auto;
             padding: 0;
-            border: none;
-            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
             width: 90%;
             max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
             animation: slideDown 0.3s ease;
             position: relative;
         }
@@ -417,24 +514,24 @@
             margin-bottom: 20px;
             padding: 15px;
             background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            border-left: 3px solid #2c5282;
         }
         
         .modal-content ul li strong {
-            color: #2c3e50;
+            color: #1a365d;
             display: block;
             margin-bottom: 8px;
         }
         
         .modal-content ul li a {
-            color: #667eea;
+            color: #2c5282;
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: color 0.2s ease;
         }
         
         .modal-content ul li a:hover {
-            color: #764ba2;
+            color: #1a365d;
             text-decoration: underline;
         }
         
@@ -498,21 +595,33 @@
     </style>
 </head>
 <body>
+    <!-- Navigation Header -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">Odds on Life</a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Calculator</a></li>
+                <li><a href="reference/index.html">Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+    
     <div class="container">
     <!-- Editable Intro Section -->
     <section id="intro">
         <h1>Divorce Risk Calculator</h1>
         <div class="intro-content">
-            <p><strong>Something to consider before you get married.</strong></p>
+            <p><strong>Realistic odds before you say ‘I do’</strong></p>
             <p>Even with the best of intentions divorce is still a risk.  
                 This tool uses known, validated risk factors from thousands of marriages across dozens of studies to estimate your divorce risk.  
                 Whenever possible I tried to avoid double counting overlapping risk factors from strong group biases, but the nature of an excercise like this is that it's not 100% perfect, so use it primarily as an educational excercise... or maybe a reality check.</p>
-            <p><strong>Why is this different from most other divorce rate calculators?</strong>  Well, most of the divorce rate calculators I've seen tend to be shorter and based on fewer studies, and because they're not custom code, they can't really do anything about overlapping risks so they tend to just ignore them, but the big thing is that they tend not to talk about risk factors that make folks uncomfortable... or maybe just aren't politically correct... I'd rather just tell you what the risks actualyly are to the best of my knowledge.</p>
-            <p>Oh also heads up... this is a pretty long survey.  I tried to apply as many factors as I possibly could instead of just picking the popular ones.  They're all backed up by studies and data, references on the results page.
-                When you're done it will try to save itself to a cookie so you can look at your answers later (as long as you're on the same browser)</p>
+            <p><strong>Why is this different from most other divorce rate calculators?</strong>  Well, most of the divorce rate calculators I've seen tend to be shorter and based on fewer studies, and because they're not custom code, they can't really do anything about overlapping risks so they tend to just ignore them, but the big thing is that they tend not to talk about risk factors that make folks uncomfortable... or maybe just aren't politically correct... I'd rather just tell you what the risks actualyly are based on the available studies.</p>
+            <p>Heads Up... this is a pretty long survey (but most of the questions are pretty easy).  I tried to apply as many factors as I possibly could instead of just picking the popular ones.  They're all backed up by studies and data, references on the results page.
+                When you're done it will try to save itself to a cookie so you can look at your answers later (as long as you're on the same browser... I don't save anything to any other servers so any data you enter never leaves your computer)</p>
         </div>
         <div style="text-align: center;">
-            <button onclick="startQuiz()">Start Quiz</button>
+            <button onclick="startQuiz()">Start Divorce Risk Calculator</button>
+            <p style="font-size: 0.75em; color: #7f8c8d; margin-top: 10px; margin-bottom: 0;">updates: 12/02/25, Updated header info, revalidated survey data</p>
             <p style="font-size: 0.75em; color: #7f8c8d; margin-top: 10px; margin-bottom: 0;">updates: 11/21/25, added extra context</p>
         </div>
         
@@ -1418,24 +1527,24 @@
             <p id="percentage"></p>
             <p id="lifetime"></p>
             <p style="font-size: 0.9em; color: #7f8c8d; margin-top: 20px; margin-bottom: 20px; line-height: 1.6;">
-                No one plans to get divorced, but a prenup can help in case it happens. And studies have shown it can have a slight protective effect. You can get one <a href="https://helloprenup.com/?via=oddsonlife" target="_blank" rel="noopener noreferrer" style="color: #667eea; text-decoration: none; font-weight: 600;">here</a>.
+                No one plans to get divorced, but a prenup can help in case it happens. And studies have shown it can have a slight protective effect. You can get one <a href="https://helloprenup.com/?via=oddsonlife" target="_blank" rel="noopener noreferrer" style="color: #2c5282; text-decoration: none; font-weight: 600;">here</a>.
             </p>
             <div class="top-factors">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h3>Top Protective Factors</h3>
-                    <a href="#" onclick="toggleProtectives(); return false;" id="toggleProtectives" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 0.9em; cursor: pointer;">Show All</a>
+                    <a href="#" onclick="toggleProtectives(); return false;" id="toggleProtectives" style="color: #2c5282; text-decoration: none; font-weight: 600; font-size: 0.9em; cursor: pointer;">Show All</a>
                 </div>
                 <ul id="protectives"></ul>
                 <ul id="protectives-all" class="hidden"></ul>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
                     <h3>Top Risk Drivers</h3>
-                    <a href="#" onclick="toggleDrivers(); return false;" id="toggleDrivers" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 0.9em; cursor: pointer;">Show All</a>
+                    <a href="#" onclick="toggleDrivers(); return false;" id="toggleDrivers" style="color: #2c5282; text-decoration: none; font-weight: 600; font-size: 0.9em; cursor: pointer;">Show All</a>
                 </div>
                 <ul id="drivers"></ul>
                 <ul id="drivers-all" class="hidden"></ul>
             </div>
             <div style="text-align: center; margin-top: 30px;">
-                <a href="#" onclick="openResearchModal(); return false;" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 0.95em;">View Research Sources</a>
+                <a href="#" onclick="openResearchModal(); return false;" style="color: #2c5282; text-decoration: none; font-weight: 600; font-size: 0.95em;">View Research Sources</a>
             </div>
         </div>
         <div style="text-align: center;">
